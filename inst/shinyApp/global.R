@@ -5,6 +5,7 @@
 # Load/install the local PF package
 if (!"pf" %in% installed.packages()) {remotes::install_local("R:/Projectfacts/ODBC/pf_app/")}
 library("pf")
+library("CTUNetwork")
 
 # Load internal functions
 # invisible(sapply(list.files(pattern="[.]R$", path="R/", full.names=TRUE), source))
