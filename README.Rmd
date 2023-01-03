@@ -1,0 +1,40 @@
+---
+output: github_document
+---
+
+<!-- README.md is generated from README.Rmd. Please edit that file -->
+
+```{r, echo = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.path = "README-"
+)
+```
+
+# CTUNetwork <img src='inst/figures/logo.png' align="right" width="200">
+
+<!-- badges: start -->
+
+`r badger::badge_custom("dev version", as.character(packageVersion("CTUNetwork")), "blue", "https://github.com/CTU-Bern/CTUNetwork")`
+<!-- [![R-CMD-check](https://github.com/CTU-Bern/redcaptools/workflows/R-CMD-check/badge.svg)](https://github.com/CTU-Bern/redcaptools/actions) -->
+
+<!-- badges: end -->
+
+`CTUNetwork` contains XXX home-grown functions for working with REDCap data in R.
+
+## Installation
+
+You can install the development version of `CTUNetwork` from github with:
+
+<!-- install.packages("redcaptools") -->
+
+```{r}
+remotes::install_github("CTU-Bern/CTUNetwork")
+```
+
+<!-- Or from CTU Bern's package universe -->
+
+<!-- ```{r} -->
+<!-- install.packages("redcaptools", repos = "https://ctu-bern.r-universe.dev") -->
+<!-- ```  -->
