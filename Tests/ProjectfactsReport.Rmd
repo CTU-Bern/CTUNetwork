@@ -1,0 +1,186 @@
+---
+title: "Shiny CTU Network Report"
+author: "User: `r Sys.getenv('USERNAME')`"
+date: "Date: `r format(Sys.time(), '%d/%m/%Y - %H:%M')`"
+output: html_document
+params:
+  Data: NA
+  Tables: NA
+  ProjLabs: NA
+  ProdFilt: NA
+  TimeBookFilt: NA
+---
+
+<!-- Full screen in HTML: -->
+
+<style type="text/css">
+.main-container {
+  max-width: 90%;
+  margin-left: auto;
+  margin-right: auto;
+}
+</style>
+
+<style type="text/css">
+.main-container {
+  max-width: 1800px;
+  margin-left: auto;
+  margin-right: auto;
+}
+</style>
+
+<!-- This code reduces margin size and increase the size of figures, see: -->
+<!-- https://stackoverflow.com/questions/34906002/increase-width-of-entire-html-rmarkdown-output -->
+<!-- https://itqna.net/questions/48098/how-adjust-margins-r-markdown -->
+
+<!-- # markdown setup -->
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = F,
+                      warning = F,
+                      message = F,
+                      device = "svg") # Figures as vectors
+knitr::opts_knit$set(root.dir = "R:/Projectfacts/Reports/1001_DLF_money/Corentin/") # define working directory
+# setwd(str_replace(rstudioapi::getSourceEditorContext()$path,"ProjectfactsReport.Rmd",""))
+
+# Install packages (if missing)
+list.of.packages <- c("remotes", "ggplot2", "DT", "gridExtra", "grid", "RColorBrewer")
+new.packages <- list.of.packages[!(list.of.packages %in% installed.packages()[,"Package"])]
+if(length(new.packages)) install.packages(new.packages)
+
+# # Load the necessary packages 
+library("ggplot2") # Nice plots
+library("DT") # Interactive plots (only for HTML documents)
+library("gridExtra") # Arranging plots in grid
+library("grid") # to use textGrob function
+library("RColorBrewer") # Custom color palettes for ggplot2
+source("R:/Projectfacts/Reports/1001_DLF_money/Corentin/Functions/convertTime.R", local = knitr::knit_global()) # Load R functions (locally)
+source("R:/Projectfacts/Reports/1001_DLF_money/Corentin/Functions/AvgTimeBookings.R", local = knitr::knit_global()) # Load R functions (locally)
+
+# Storing data argument
+Data <- params$Data
+TablesIdx <- params$Tables
+ProjLabs.df <- data.frame(Name = params$ProjLabs)
+ProdFilt <- params$ProdFilt
+TimeBookFilt <- params$TimeBookFilt
+print(params$TimeBookFilt)
+
+# Defining the date to use as lower bound of time range
+DateYr <- as.Date(paste(format(Sys.time(),"%Y"),"-01-01",sep=""), format="%Y-%m-%d")
+
+# Filter project types according to UI    
+# ProjTypes.df <- data.frame(Name = c("External", "Consulting","Internal","Internal","FTE"),
+#                            Pattern = c("P-","C-","I-","IB-","FTE-"))
+# ProjLabs.df <- left_join(ProjLabs.df, ProjTypes.df, by = "Name")
+# ProjStr <- paste(ProjLabs.df$Pattern,collapse="|")
+# Data <- Data[grepl(ProjStr,Data$ProjectIDs),]
+
+# Collapse individual entries into one line (sum)
+Idx <- split(seq_along(Data$UniqueCode), Data$UniqueCode)
+Idx <- Idx[!sapply(Idx, function(i) length(i) < 2)] # Removing list element which are not repeated
+TimeSpentSum <- foreach(k=1:length(Idx), .combine = 'c') %do%
+  sum(Data$TimeSpent[Idx[[k]]])
+Data = Data[!duplicated(Data$UniqueCode),] # Removing duplicated lines
+for (k in 1:length(Idx)) {Data$TimeSpent[Data$UniqueCode==names(Idx)[k]] = TimeSpentSum[k]}
+
+# Flag to determine which lines correspond to the top level
+Data$Levels <- ifelse(grepl(ProjStr, Data$ProjectID)==T,T,F)
+
+# Adding the fraction column
+# Indicate the percentage of TimeSpent on a project compared to all projects
+ProjIdx <- Data$Levels==T
+SumTimeSpent <- sum(Data$TimeSpent[ProjIdx],na.rm=T)
+Data$Fraction <- rep(NA,dim(Data)[1]) # Populate the new column with NAs
+Data$Fraction[ProjIdx] <- Data$TimeSpent[ProjIdx]/SumTimeSpent*100
+
+# Convert time to HH:MM 
+ColIdx <- which(names(Data) %in% c("TimeSpent","TimeBudget"))
+Data[,ColIdx] <- lapply(Data[,ColIdx], ConvertTime)
+
+# TEMP !!!!
+# save(Data, ProdFilt, TimeBookFilt, file = "R:/Projectfacts/Reports/1001_DLF_money/Corentin/Data.RData")
+
+```
+
+
+<!-- # TABLES -->
+
+## Projects characteristics
+
+This table summarizes the characteristics of the project that were retrieved from \
+the "Project Details" tab in ProjectFacts.
+
+Time filtering parameters: \
+"Productive from `r ProdFilt[1]` to `r ProdFilt[2]`" \
+"Time bookings from `r TimeBookFilt[1]` to `r TimeBookFilt[2]`"
+
+Each column represent:
+
+ProjectID: The ProjectFacts identification number \
+ProjectName: The name associated to the project \
+Service: The type of service (Basic, Light, Full) \
+ProdDate: Date corresponding to the moment the project was set productive \
+TimeSpent: The total amount of hours that were booked \
+TimeBudget: The total amount of hours that were budgeted \
+TimePercent: The total amount of hours that were budgeted \
+
+
+```{r Project characteristics Table}
+
+# Isolating columns useful for this table
+ProjectChar.df = Data[,c("ProjectID","ProjectName","Service","ProdDate","TimeSpent","TimeBudget","TimePercent","Fraction","Levels")]
+ProjectChar.df$ProdDate = format(ProjectChar.df$ProdDate,"%d-%m-%Y")
+ProjectChar.df[,"ProjectID"] = droplevels(ProjectChar.df[,"ProjectID"]) # Removing unused factorS levels
+ProjectChar.df[ProjectChar.df$Levels == 1,"ProdDate"] = NA # No need to duplicate the productive date
+ProjectChar.df$TimePercent = ifelse(ProjectChar.df$TimePercent>100,100,ProjectChar.df$TimePercent) # Maximum is 100%
+
+
+
+# Building the table
+datatable(ProjectChar.df, 
+          class = 'cell-border stripe', 
+          rownames = F, 
+          colnames=c("Productive Date" = "ProdDate", "Time Booked (HH:MM)" = "TimeSpent",
+                     "Time Budget (HH:MM)" = "TimeBudget", "Time Booked/Budget [%]" = "TimePercent", 
+                     "Fraction Spent/All [%]" = "Fraction"),
+          filter = 'top',
+          extensions = c('Buttons','ColReorder',"FixedHeader"),
+          options = list(autoWidth = T, 
+                         fixedHeader=TRUE,
+                         pageLength = 150,
+                         columnDefs = list(list(visible=FALSE, targets=dim(ProjectChar.df)[2]-1)), # Hide specified columns
+                         dom = 'Bfrtip', # Buttons position
+                         buttons = list('copy', 'print',
+                                        list(extend = 'collection',
+                                          buttons = list('csv', 'excel', 'pdf', 
+                                                         list(extend = 'pdfHtml5',
+                                                           orientation = 'landscape',
+                                                           pageSize ='LEGAL',
+                                                           text = "pdfLand")),
+                                          text = 'Download')),
+                         colReorder = TRUE)) %>% # Enable to change the columns position 
+  
+  # Project level headers
+  formatStyle('Levels',target = 'row', backgroundColor = styleEqual(c(0, 1), c('#F5F5F5', "#45B0B2"))) %>%
+
+  # Progress bars
+  formatStyle(
+    "Time Booked/Budget [%]",
+    # background = styleColorBar(ProjectChar.df$TimePercent, "#B24745FF"), # [Table.df$Levels==T]
+    backgroundColor = styleEqual(100, "#B24745FF"),
+    # backgroundColor = styleInt(100, c('#F5F5F5',"#B24745FF")),
+    backgroundSize = '100% 90%',
+    backgroundRepeat = 'no-repeat',
+    backgroundPosition = 'center') %>%
+
+  # round specific columns
+  formatRound(c("Time Booked/Budget [%]","Fraction Spent/All [%]"), 2)
+
+# How to create a child table (javascript implementation)
+# This is unfortunately very complicated...
+# https://www.r-bloggers.com/2020/05/child-tables-with-dt-editing-exporting/
+# https://stackoverflow.com/questions/62834622/parent-child-rows-in-shiny-r-with-a-single-dataframe-that-has-a-variable-number
+```
+
+
+

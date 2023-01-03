@@ -1,0 +1,35 @@
+Package: CTUNetwork
+Title: Network graph of Projectsfacts data for CTU Bern
+Version: 0.0.0.9000
+Authors@R: 
+    c(person("Corentin A.", "Wicht", "corentin.wicht@ctu.unibe.ch", role = c("aut", "cre"), comment = c(ORCID = "0000-0003-0789-277X")), 
+    person("Alan G.", "Haynes", "alan.haynes@ctu.unibe.ch", role = "cre", comment = c(ORCID = "0000-0003-1374-081X")))
+Author: Corentin A. Wicht [aut, cre]
+Maintainer: Alan G. Haynes <alan.haynes@ctu.unibe.ch>
+Description: The CTU Network shiny app provides a dynamic network visualization of Projectfacts data specific to CTU Bern. Through filtering options, the user can fine-tune the input data which will influence the network representation as well as the bar graphs and table. 
+License: GPL-3
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.2.3
+Imports:
+    cowplot,
+    data.table,
+    dplyr,
+    DT,
+    ggplot2,
+    grid,
+    gridExtra,
+    igraph,
+    lubridate,
+    pf,
+    reshape2,
+    scales,
+    shiny,
+    shinydashboard,
+    shinyjs,
+    stringr,
+    tidyr,
+    visNetwork
+Depends:
+    foreach,
+    magrittr,

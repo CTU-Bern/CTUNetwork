@@ -1,0 +1,6 @@
+^renv$
+^renv\.lock$
+^CTUNetwork\.Rproj$
+^\.Rproj\.user$
+^LICENSE\.md$
+^Tests$
