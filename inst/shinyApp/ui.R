@@ -72,7 +72,8 @@ ui <- shinydashboard::dashboardPage(
                solidHeader = TRUE,
                collapsible = TRUE,
                collapsed = T,
-               shiny::plotOutput("IndivNodes", height = 1000))),
+               # shiny::plotOutput("IndivNodes", height = 1000)
+               shiny::uiOutput("IndivNodes.ui"))),
 
    # 4. Data table
   shiny::fluidRow(tags$head(tags$style(".checkbox-inline {margin: 0 !important;}")),
@@ -88,6 +89,6 @@ ui <- shinydashboard::dashboardPage(
                                    choices = AllRows,
                                    selected = SelectRows,
                                    inline = TRUE),
-                DT::dataTableOutput("DataTable")))
+                DT::dataTableOutput("DataTable", width = "99%")))
   )
 )

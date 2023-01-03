@@ -219,6 +219,17 @@ server <- function(input, output) { # Assemble inputs into outputs
   })
 
   # 3.2 Individual nodes
+  plotCount <- reactive({
+    req(input$node_id)
+    FilterTag <- ifelse(grepl("P-",input$node_id),"Workers","ProjectIDs")
+    FilterItem <- sort(unique(Plot.df()[,FilterTag]), index.return = T)
+    length(FilterItem$x)
+  })
+  
+  # Dynamically adjusting plot height
+  plotHeight <- reactive(300 * ceiling(plotCount()/3))  
+  
+  
   output$IndivNodes <- shiny::renderPlot({
     if (!is.null(input$node_id)) {
 
@@ -254,6 +265,11 @@ server <- function(input, output) { # Assemble inputs into outputs
       do.call(gridExtra::grid.arrange, c(Plots,ncol=3))
     }
   })
+  
+  # Render the plot
+  output$IndivNodes.ui <- shiny::renderUI({
+    shiny::plotOutput("IndivNodes", height = plotHeight())
+  })
 
   # 4.0 Data table
   output$DataTable = DT::renderDataTable({
@@ -274,7 +290,7 @@ server <- function(input, output) { # Assemble inputs into outputs
 
         # If one worker is selected
         } else {
-          # IdxWorker <- grepl("André Moser",AllData()$DataUp$Workers,ignore.case = T)
+          # IdxWorker <- grepl("AndrC) Moser",AllData()$DataUp$Workers,ignore.case = T)
           IdxWorker <- grepl(input$node_id,AllData()$DataUp$Workers,ignore.case = T)
           BuildTable(AllData()$DataUp[IdxWorker,Cols])
         }

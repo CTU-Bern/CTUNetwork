@@ -91,3 +91,12 @@ Finally, filter and replace Projectfacts key codes by real values
 ```{r filterData, eval = F}
 FiltData <- CTUNetwork::filterData(Data, All_Tabs)
 ```
+
+
+## Contributing
+
+Contributions to `CTUNetwork` are welcome. If you have ideas, open an [issue](https://github.com/CTU-Bern/CTUNetwork/issues) or a [discussion thread](https://github.com/CTU-Bern/CTUNetwork/discussions) on GitHub. 
+
+## Acknowledgements
+
+The package logo was created with [`ggplot2`](https://ggplot2.tidyverse.org/) and [`hexSticker`](https://github.com/GuangchuangYu/hexSticker) with icons from [Font Awesome](https://fontawesome.com/).

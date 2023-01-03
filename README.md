@@ -5,7 +5,7 @@
 
 <!-- badges: start -->
 
-[![](https://img.shields.io/badge/dev%20version-0.0.0.9000-blue.svg)](https://github.com/CTU-Bern/CTUNetwork)
+[![](https://img.shields.io/badge/dev%20version-0.1.0-blue.svg)](https://github.com/CTU-Bern/CTUNetwork)
 <!-- [![R-CMD-check](https://github.com/CTU-Bern/redcaptools/workflows/R-CMD-check/badge.svg)](https://github.com/CTU-Bern/redcaptools/actions) -->
 
 <!-- badges: end -->
@@ -88,3 +88,16 @@ Finally, filter and replace Projectfacts key codes by real values
 ``` r
 FiltData <- CTUNetwork::filterData(Data, All_Tabs)
 ```
+
+## Contributing
+
+Contributions to `CTUNetwork` are welcome. If you have ideas, open an
+[issue](https://github.com/CTU-Bern/CTUNetwork/issues) or a [discussion
+thread](https://github.com/CTU-Bern/CTUNetwork/discussions) on GitHub.
+
+## Acknowledgements
+
+The package logo was created with
+[`ggplot2`](https://ggplot2.tidyverse.org/) and
+[`hexSticker`](https://github.com/GuangchuangYu/hexSticker) with icons
+from [Font Awesome](https://fontawesome.com/).

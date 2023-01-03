@@ -1,6 +1,6 @@
 Package: CTUNetwork
 Title: Network graph of Projectsfacts data for CTU Bern
-Version: 0.0.0.9000
+Version: 0.1.0
 Authors@R: 
     c(person("Corentin A.", "Wicht", "corentin.wicht@ctu.unibe.ch", role = c("aut", "cre"), comment = c(ORCID = "0000-0003-0789-277X")), 
     person("Alan G.", "Haynes", "alan.haynes@ctu.unibe.ch", role = "cre", comment = c(ORCID = "0000-0003-1374-081X")))
