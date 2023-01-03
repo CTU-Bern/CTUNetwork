@@ -1,16 +1,8 @@
+# Load libraries
 library(ggplot2)
-# library(emojifont)
-# library(scales)
-# library(hexSticker)
+library(hexSticker)
 library(magick)
 library(cowplot)
-# library(fontawesome) # fa5
-# library(icons) # https://github.com/mitchelloharawild/icons
-#
-# load.fontawesome()
-#
-# # BackgroundIcon <- fa(name = "fas fa-circle-nodes", fill = "#00798c")
-# shiny::icon("circle-nodes")
 
 # Image URL
 imgurl <- paste0(getwd(),"/figures/circle-nodes.png")
@@ -25,7 +17,7 @@ icon <- ggplot() +
 # Create the sticker
 s <- sticker(icon, package="",
              s_x=1, s_y=1, s_width=2, s_height=2,
-             filename="man/figures/logo.png",
+             filename="figures/logo.png",
              h_fill = colorRampPalette(c("white", CTUtemplate::unibeRed()))(6)[3],
              h_color = CTUtemplate::unibeRed(),
              h_size = 2,
