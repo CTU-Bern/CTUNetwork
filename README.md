@@ -32,20 +32,20 @@ remotes::install_github("CTU-Bern/CTUNetwork")
 
 ## Overview
 
-| Function            | Purpose                                                                           |
-|---------------------|-----------------------------------------------------------------------------------|
-| `AvgTimeBookings.R` | Cumulative sum of time bookings over package/project levels                       |
-| `BuildTable.R`      | Print a datatable object                                                          |
-| `Calculations.R`    | Computing calculations for HourlyCosts, MoneySpent and TimePercent variables      |
-| `convertTime.R`     | Convert time in minutes as integers to standard HH:MM                             |
-| `extractData.R`     | Extract and format Projectfacts data from the getPFData function                  |
-| `filterData.R`      | Filter ProjectFacts data from the getPFData function                              |
-| `FilterNotes.R`     | Extracting text information encapsulated between html-like tags, e.g. Notes field |
-| `ggColorHue.R`      | Emulate ggplot2 color palette                                                     |
-| `NetworkPlot.R`     | Network plot function - Build the network                                         |
-| `shinyApp.R`        | Run the CTUNetwork app                                                            |
-| `StandardDates.R`   | Standardizing dates to European format, i.e. DD-MM-YYYY                           |
-| `themeShiny.R`      | Customized ggplot2 theme applied to homogenize the plots in Shiny App             |
+| Function                                   | Purpose                                                                           |
+|--------------------------------------------|-----------------------------------------------------------------------------------|
+| [`AvgTimeBookings.R`](R/AvgTimeBookings.R) | Cumulative sum of time bookings over package/project levels                       |
+| `BuildTable.R`                             | Print a datatable object                                                          |
+| `Calculations.R`                           | Computing calculations for HourlyCosts, MoneySpent and TimePercent variables      |
+| `convertTime.R`                            | Convert time in minutes as integers to standard HH:MM                             |
+| `extractData.R`                            | Extract and format Projectfacts data from the getPFData function                  |
+| `filterData.R`                             | Filter ProjectFacts data from the getPFData function                              |
+| `FilterNotes.R`                            | Extracting text information encapsulated between html-like tags, e.g. Notes field |
+| `ggColorHue.R`                             | Emulate ggplot2 color palette                                                     |
+| `NetworkPlot.R`                            | Network plot function - Build the network                                         |
+| `shinyApp.R`                               | Run the CTUNetwork app                                                            |
+| `StandardDates.R`                          | Standardizing dates to European format, i.e. DD-MM-YYYY                           |
+| `themeShiny.R`                             | Customized ggplot2 theme applied to homogenize the plots in Shiny App             |
 
 ## Usage
 

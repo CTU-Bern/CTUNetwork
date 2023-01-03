@@ -43,7 +43,7 @@ remotes::install_github("CTU-Bern/CTUNetwork")
 
 Function | Purpose
 -------- | ---------- 
-`AvgTimeBookings.R` | Cumulative sum of time bookings over package/project levels
+[`AvgTimeBookings.R`](R/AvgTimeBookings.R) | Cumulative sum of time bookings over package/project levels
 `BuildTable.R` | Print a datatable object
 `Calculations.R` | Computing calculations for HourlyCosts, MoneySpent and TimePercent variables
 `convertTime.R` | Convert time in minutes as integers to standard HH:MM
