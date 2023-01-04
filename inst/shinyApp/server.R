@@ -96,7 +96,7 @@ server <- function(input, output) { # Assemble inputs into outputs
 
     # Filter for time bookings
     if (all(!is.na(input$timebookfilter))) {
-      DataUp <- DataUp[!DataUp$Filt | DataUp$BookedDate %in% input$timebookfilter[1]:input$timebookfilter[2],]
+      DataUp <- DataUp[is.na(DataUp$BookedDate) | DataUp$BookedDate %in% input$timebookfilter[1]:input$timebookfilter[2],]
       # !DataUp$Filt is to avoid deleting project and package levels
     }
 
@@ -104,7 +104,6 @@ server <- function(input, output) { # Assemble inputs into outputs
     DataUp <- Calculations(DataUp)
 
     ## Preparing data for network
-    # Creating a separate database for the plot (not to mess with the Markdown report data)
     # Removing the lines corresponding to the project level (the aim is to separate for each division)
     DataPlot <- DataUp[DataUp$Filt,]
 
@@ -225,11 +224,11 @@ server <- function(input, output) { # Assemble inputs into outputs
     FilterItem <- sort(unique(Plot.df()[,FilterTag]), index.return = T)
     length(FilterItem$x)
   })
-  
+
   # Dynamically adjusting plot height
-  plotHeight <- reactive(300 * ceiling(plotCount()/3))  
-  
-  
+  plotHeight <- reactive(300 * ceiling(plotCount()/3))
+
+
   output$IndivNodes <- shiny::renderPlot({
     if (!is.null(input$node_id)) {
 
@@ -265,7 +264,7 @@ server <- function(input, output) { # Assemble inputs into outputs
       do.call(gridExtra::grid.arrange, c(Plots,ncol=3))
     }
   })
-  
+
   # Render the plot
   output$IndivNodes.ui <- shiny::renderUI({
     shiny::plotOutput("IndivNodes", height = plotHeight())

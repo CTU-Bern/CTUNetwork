@@ -7,9 +7,6 @@ if (!"pf" %in% installed.packages()) {remotes::install_local("R:/Projectfacts/OD
 library("pf")
 library("CTUNetwork")
 
-# Load internal functions
-# invisible(sapply(list.files(pattern="[.]R$", path="R/", full.names=TRUE), source))
-
 # Retrieve data from ProjectFacts
 All_Tabs <- getPFData()
 
