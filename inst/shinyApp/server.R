@@ -196,20 +196,21 @@ server <- function(input, output) { # Assemble inputs into outputs
 
   # Filter data
   Plot.df <- shiny::reactive(
-    if (grepl("P-",input$node_id, ignore.case = T)) {
-      Plot.df <- AllData()$DataPlot[AllData()$DataPlot$ProjectIDs==input$node_id,]
+    if (any(grepl(input$node_id,unique(AllData()$DataPlot$Workers)))) {
+      Plot.df <- AllData()$DataPlot[AllData()$DataPlot$Workers %in% input$node_id,]
     } else {
-      Plot.df <- AllData()$DataPlot[AllData()$DataPlot$Workers==input$node_id,]
+      Plot.df <- AllData()$DataPlot[AllData()$DataPlot[paste0("Project",input$projectlab)]==input$node_id,]
     })
 
   # 3.1 Grouped nodes
   output$GroupedNodes <- shiny::renderPlot({
     if (!is.null(input$node_id)) {
-      if (grepl("P-",input$node_id, ignore.case = T)) {
+      if (!any(grepl(input$node_id,unique(Plot.df()$Workers)))) {
 
         # Plot
         ggplot(Plot.df(), aes(x = Workers, y = TimeSpent, fill = Workers)) +
-          labs(title = paste(input$node_id, Plot.df()$ProjectNames, sep=" - "), y = "Time Booked [Min]") +
+          # labs(title = paste(input$node_id, Plot.df()$ProjectNames, sep=" - "), y = "Time Booked [Min]") +
+          labs(title = paste(Plot.df()$ProjectIDs, Plot.df()$ProjectNames, sep=" - "), y = "Time Booked [Min]") +
           geom_bar(stat = "identity", alpha = 0.8) +
           stat_summary(aes(label = after_stat(y)), fun = sum, geom = 'text', vjust = -0.4) +
           themeShiny(titleSize = 17)
@@ -220,7 +221,8 @@ server <- function(input, output) { # Assemble inputs into outputs
   # 3.2 Individual nodes
   plotCount <- reactive({
     req(input$node_id)
-    FilterTag <- ifelse(grepl("P-",input$node_id),"Workers","ProjectIDs")
+    # FilterTag <- ifelse(grepl("P-",input$node_id),"Workers","ProjectIDs")
+    FilterTag <- ifelse(any(grepl(input$node_id,unique(Plot.df()$Workers))),"ProjectIDs","Workers")
     FilterItem <- sort(unique(Plot.df()[,FilterTag]), index.return = T)
     length(FilterItem$x)
   })
@@ -233,12 +235,13 @@ server <- function(input, output) { # Assemble inputs into outputs
     if (!is.null(input$node_id)) {
 
       Plots <- list(); TEMP.df <- data.frame()
-      FilterTag <- ifelse(grepl("P-",input$node_id),"Workers","ProjectIDs")
+      # FilterTag <- ifelse(grepl("P-",input$node_id),"Workers","ProjectIDs")
+      FilterTag <- ifelse(any(grepl(input$node_id,unique(Plot.df()$Workers))),"ProjectIDs","Workers")
       FilterItem <- sort(unique(Plot.df()[,FilterTag]), index.return = T)
       ProjNames <- unique(Plot.df()$ProjectNames)[FilterItem$ix]
       Colors <- ggColorHue(length(FilterItem$x))
       for(i in 1:length(FilterItem$x)){
-        TEMP.df <- Plot.df()[Plot.df()[,FilterTag]==FilterItem$x[i],]
+        TEMP.df <- Plot.df()[Plot.df()[,FilterTag] %in% FilterItem$x[i],]
         Plots[[i]] <-
           ggplot(TEMP.df, aes(x = BookedDate, y = TimeSpent, fill = .data[[FilterTag]])) +
           scale_fill_manual(values = Colors[i]) +
@@ -257,7 +260,7 @@ server <- function(input, output) { # Assemble inputs into outputs
             geom_col(alpha = 0.6)
         }
         # Adding project name to ID only if displaying grid of projects
-        if (!grepl("P-",input$node_id)){
+        if (any(grepl(input$node_id,unique(Plot.df()$Workers)))){
           Plots[[i]] <- Plots[[i]] +
           labs(title = paste(FilterItem$x[i], ProjNames[i], sep=" - "))}
        }
