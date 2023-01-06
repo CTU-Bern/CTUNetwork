@@ -72,14 +72,20 @@ server <- function(input, output) { # Assemble inputs into outputs
         DataUp$UniqueCode %in% DataUp$ProjectLvl[as.logical(FiltIdx)]
 
       # Filter for service type
-      if (input$servicetype!="\a") {FiltIdx <- FiltIdx & as.logical(mapply(grepl,input$servicetype,DataUp$ServiceType, ignore.case=T))}
+      if (input$servicetype!="\a") {FiltIdx <- FiltIdx & grepl(input$servicetype, DataUp$Service, ignore.case=T)}
 
       # Filter for clinical data management system (CDMS)
-      if (input$cdms!="\a") {FiltIdx <- FiltIdx & as.logical(mapply(grepl,input$cdms,DataUp$CDMS, ignore.case=T))}
+      # if (input$cdms!="\a") {FiltIdx <- FiltIdx & as.logical(mapply(grepl,input$cdms,DataUp$CDMS, ignore.case=T))}
+      if (input$cdms!="\a") {FiltIdx <- FiltIdx & grepl(input$cdms,DataUp$CDMS, ignore.case=T)}
 
       # Filter for DLF support
       if (input$dlfsupport!="\a") {
-        DataUp <- DataUp[which(DataUp$DLFSupport==ifelse(input$dlfsupport=="Yes", T, F)),]
+        DataUp <- DataUp[grepl(ifelse(input$dlfsupport=="Yes", T, F),DataUp$DLFSupport),]
+      }
+
+      # Filter for DLF support
+      if (input$dlfreached!="\a") {
+        DataUp <- DataUp[grepl(ifelse(input$dlfreached=="Yes", T, F),DataUp$DLFReached),]
       }
 
       # Apply filtering
@@ -97,10 +103,13 @@ server <- function(input, output) { # Assemble inputs into outputs
     # Filter for time bookings
     if (all(!is.na(input$timebookfilter))) {
       DataUp <- DataUp[is.na(DataUp$BookedDate) | DataUp$BookedDate %in% input$timebookfilter[1]:input$timebookfilter[2],]
-      # !DataUp$Filt is to avoid deleting project and package levels
     }
 
     # Computing different calculations based on filtering parameters
+    # THERE SEEMS TO BE A PROBLEM HERE:
+    # The MoneySpent over project doesn't make sense when TimeBooking filters are applied
+    # DataUp <- DataUp[is.na(DataUp$BookedDate) | DataUp$BookedDate %in% as.Date("2020-01-01"):as.Date("2022-12-29"),]
+    # Project P-0634 as example: 908.10000 (DM) + 35910.000000 (Cloud) NOT EQUAL TO 95078.100000 (Total)
     DataUp <- Calculations(DataUp)
 
     ## Preparing data for network
@@ -111,7 +120,7 @@ server <- function(input, output) { # Assemble inputs into outputs
     DataPlot$State <- factor(DataPlot$State, levels = unique(DataPlot$State))
 
     # Color palette
-    Colors <- ggColorHue(length(unique(DataPlot$State))+1)
+    Colors <- ggColorHue(length(levels(DataPlot$State))+1)
 
     # Colors dataframe
     Colors.df <- data.frame(id = seq(1,length(levels(DataPlot$State))+1),
@@ -177,7 +186,7 @@ server <- function(input, output) { # Assemble inputs into outputs
       geom_bar() +
       theme(legend.position='right',
             text = element_text(size = 15),
-            legend.spacing.y = unit(1.0, 'cm')) +
+            legend.spacing.y = unit(0.7, 'cm')) +
       scale_fill_manual(values = as.character(unique(AllData()$Nodes$color))) +
       guides(fill = guide_legend(title = "State", title.position = "top", title.hjust = 0.5, byrow = TRUE))
 
@@ -210,7 +219,7 @@ server <- function(input, output) { # Assemble inputs into outputs
         # Plot
         ggplot(Plot.df(), aes(x = Workers, y = TimeSpent, fill = Workers)) +
           # labs(title = paste(input$node_id, Plot.df()$ProjectNames, sep=" - "), y = "Time Booked [Min]") +
-          labs(title = paste(Plot.df()$ProjectIDs, Plot.df()$ProjectNames, sep=" - "), y = "Time Booked [Min]") +
+          labs(title = paste(Plot.df()$ProjectIDs, Plot.df()$ProjectNames, sep=" - "), y = "Time Spent [Min]") +
           geom_bar(stat = "identity", alpha = 0.8) +
           stat_summary(aes(label = after_stat(y)), fun = sum, geom = 'text', vjust = -0.4) +
           themeShiny(titleSize = 17)
@@ -229,7 +238,6 @@ server <- function(input, output) { # Assemble inputs into outputs
 
   # Dynamically adjusting plot height
   plotHeight <- reactive(300 * ceiling(plotCount()/3))
-
 
   output$IndivNodes <- shiny::renderPlot({
     if (!is.null(input$node_id)) {
@@ -262,7 +270,7 @@ server <- function(input, output) { # Assemble inputs into outputs
         # Adding project name to ID only if displaying grid of projects
         if (any(grepl(input$node_id,unique(Plot.df()$Workers)))){
           Plots[[i]] <- Plots[[i]] +
-          labs(title = paste(FilterItem$x[i], ProjNames[i], sep=" - "))}
+          labs(title = stringr::str_wrap(paste(FilterItem$x[i], ProjNames[i], sep=" - "),50))}
        }
       do.call(gridExtra::grid.arrange, c(Plots,ncol=3))
     }
@@ -276,25 +284,36 @@ server <- function(input, output) { # Assemble inputs into outputs
   # 4.0 Data table
   output$DataTable = DT::renderDataTable({
 
+    # Removing the list of all workers at the project level (useless)
+    DataUpTab <- AllData()$DataUp
+    Idx = grepl("\\,", DataUpTab$Workers)
+    DataUpTab$Workers[Idx] <- NA
+
+    # No need to repeat the DLF support & service values
+    DataUpTab$DLFSupport[DataUpTab$Levels == F] <- NA
+    DataUpTab$DLFReached <- as.factor(DataUpTab$DLFReached) # looks different if not factor
+    DataUpTab$Service[DataUpTab$Levels == F] <- NA
+
+    # Round MoneySpent to 2 decimals
+    DataUpTab$MoneySpent <- round(DataUpTab$MoneySpent,2)
+
     # Columns are adjusted based on checkboxes
-    Cols <- c(colnames(AllData()$DataUp[as.integer(input$tablevars)]),"Fraction","Levels")
+    Cols <- c(colnames(DataUpTab[as.integer(input$tablevars)]),"Fraction","Levels")
 
     # By default return the whole table and filter if node is selected
     if (is.null(input$node_id)) {
-        BuildTable(AllData()$DataUp[,Cols])
+        BuildTable(DataUpTab[,Cols])
 
       } else {
         # If one node is selected
         if(grepl("P-",input$node_id)) {
-          # IdxProj <- AllData()$DataUp$ProjectIDs=="P-0628"
-          IdxProj <- AllData()$DataUp$ProjectIDs==input$node_id
-          BuildTable(AllData()$DataUp[IdxProj,Cols])
+          IdxProj <- DataUpTab$ProjectIDs==input$node_id
+          BuildTable(DataUpTab[IdxProj,Cols])
 
         # If one worker is selected
         } else {
-          # IdxWorker <- grepl("AndrC) Moser",AllData()$DataUp$Workers,ignore.case = T)
-          IdxWorker <- grepl(input$node_id,AllData()$DataUp$Workers,ignore.case = T)
-          BuildTable(AllData()$DataUp[IdxWorker,Cols])
+          IdxWorker <- grepl(input$node_id,DataUpTab$Workers,ignore.case = T)
+          BuildTable(DataUpTab[IdxWorker,Cols])
         }
       }
    })

@@ -27,15 +27,17 @@ AvgTimeBookings <- function(DF) {
     # Focusing on package level
     Pkg <- ProjDF %>%
       dplyr::group_by(PackageLvl,ProjectLvl) %>%
-      dplyr::summarise(TimeSpent=sum(TimeSpent, na.rm=T),
-                Workers = paste(unique(Workers[!is.na(Workers)]),collapse=","))
+      dplyr::summarise(TimeSpent = sum(TimeSpent, na.rm=T),
+                       MoneySpent = sum(MoneySpent, na.rm = T),
+                       Workers = paste(unique(Workers[!is.na(Workers)]),collapse=","))
     Pkg <- Pkg[!is.na(Pkg$TimeSpent),]
 
     # Focusing on project level
     Proj <- ProjDF %>%
       dplyr::group_by(ProjectLvl) %>%
-      dplyr::summarise(TimeSpent=sum(TimeSpent, na.rm=T),
-                Workers = paste(unique(Workers[!is.na(Workers)]),collapse=","))
+      dplyr::summarise(TimeSpent = sum(TimeSpent, na.rm = T),
+                       MoneySpent = sum(MoneySpent, na.rm = T),
+                       Workers = paste(unique(Workers[!is.na(Workers)]),collapse=","))
     Proj$Workers <- ifelse(substr(Proj$Workers, 1, 1) == ",", sub("^,", "", Proj$Workers), Proj$Workers)
 
     # Removing lines with values = 0
@@ -51,11 +53,12 @@ AvgTimeBookings <- function(DF) {
     ProjDF$UniqueCode <- as.factor(ProjDF$UniqueCode)
 
     # Joining the two dataframes
-    ProjDF <- left_join(ProjDF, PkgProj, by = c("UniqueCode" = "PackageLvl")) %>%
-      dplyr::mutate(TimeSpent.x = coalesce(TimeSpent.x,TimeSpent.y)) %>% # Regrouping the columns
-      dplyr::mutate(Workers.x = coalesce(Workers.x,Workers.y)) %>%
-      data.table::setnames(c("TimeSpent.x","Workers.x"), c("TimeSpent","Workers")) %>%
-      dplyr::select(-TimeSpent.y, -Workers.y)
+    ProjDF <- dplyr::left_join(ProjDF, PkgProj, by = c("UniqueCode" = "PackageLvl")) %>%
+      dplyr::mutate(TimeSpent.x = dplyr::coalesce(TimeSpent.x,TimeSpent.y)) %>% # Regrouping the columns
+      dplyr::mutate(MoneySpent.x = dplyr::coalesce(MoneySpent.x,MoneySpent.y)) %>% # Regrouping the columns
+      dplyr::mutate(Workers.x = dplyr::coalesce(Workers.x,Workers.y)) %>%
+      data.table::setnames(c("TimeSpent.x","Workers.x","MoneySpent.x"), c("TimeSpent","Workers","MoneySpent")) %>%
+      dplyr::select(-TimeSpent.y, -Workers.y, -MoneySpent.y)
   }
 
   # Merge the two datasets

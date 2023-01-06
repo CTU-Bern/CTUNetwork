@@ -15,6 +15,8 @@ All_Tabs <- getPFData()
 # $customfields = list of the custom fields
 # $financearticle = types of work packages (Basic, Light, Full services)
 # $projectstatedefinition = Explanations related to projects state code
+# $financeposition = Invoices at package level
+# $financerecord = Invoices total at project level
 All_Tabs = All_Tabs[c("activitydata","customer","crmkontakt","financeposition",
                       "project","projectstatedefinition","worker")]
 

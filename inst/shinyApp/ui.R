@@ -25,6 +25,7 @@ ui <- shinydashboard::dashboardPage(
       shiny::selectInput("servicetype", label = "Service types", choices = c("\a", "Basic", "Full", "Light")),
       shiny::checkboxGroupInput('projecttype', "Project types", c("External", "Consulting","Internal","FTE"), selected = "External"),
       shiny::selectInput("dlfsupport", label = "DLF support", choices = c("\a", "Yes", "No")),
+      shiny::selectInput("dlfreached", label = "DLF reached", choices = c("\a", "Yes", "No")),
       shiny::selectInput("cdms", label = "CDMS", choices = c("\a","REDCap", "secuTrial", "Webspirit")),
       shiny::dateRangeInput("prodfilter", label = "Productive date",
                     min = min(Data$ProdDate, na.rm = T), max = max(Data$ProdDate, na.rm = T)),

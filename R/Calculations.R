@@ -14,21 +14,30 @@
 
 Calculations <- function(Data){
 
-  # Cumulative sum over package and project levels
-  Data <- CTUNetwork::AvgTimeBookings(Data)
-
   # Computing the hourly costs (time X worker rate)
-  Data$HourlyCosts <- Data$TimeSpent/60 * Data$WorkerRate
+  # Not needed anymore, now taken from INCOMEFROMINVOICE_BILLABLE (same result)
+  # Data$HourlyCosts <- Data$TimeSpent/60 * Data$WorkerRate
 
-  # Adding up FixedCosts and HourlyCosts
-  Data$MoneySpent <- rowSums(Data[,c("FixedCosts","HourlyCosts")], na.rm=T)
+  # Adding up FixedCosts (for packages)
+  Data$MoneySpent[Data$Filt] <- rowSums(Data[Data$Filt, c("FixedCosts","HourlyCosts")], na.rm=T)
+
+  # Cumulative sum over package and project levels
+  Data <- AvgTimeBookings(Data)
+
+  # Adding up FixedCosts (for projects) - This needs to be done after the averaging process
+  Data$MoneySpent[!Data$Filt] <- rowSums(Data[!Data$Filt,c("FixedCosts","MoneySpent")], na.rm=T)
   Data$MoneySpent  <- ifelse(Data$MoneySpent==0,NA,Data$MoneySpent)
 
   # Computing the percentage of time worked/time budgeted
-  Data$TimePercent <- Data$TimeSpent/Data$TimeBudget*100
+  Data$TimePercent[!Data$Filt] <- Data$TimeSpent[!Data$Filt]/Data$TimeBudget[!Data$Filt]*100
 
   # Reordering the database according to natural order
   Data <- Data[stringr::str_order(Data$ProjectIDs),]
+
+  # Determine if DLF is reached (MoneySpent > 3000CHF)
+  Idx = which(grepl("P-", Data$ProjectID))
+  Data$DLFReached <- as.logical(Data$DLFReached)
+  Data$DLFReached[Idx] <- ifelse(Data$MoneySpent[Idx] > 3000, TRUE, FALSE)
 
   # OUTPUT
   return(Data)

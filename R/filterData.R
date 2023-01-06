@@ -23,9 +23,7 @@ filterData <- function(Data, All_Tabs, DLF = F, Divisions = NA, DateFrom = NA, S
   options(dplyr.summarise.inform = FALSE)
 
   # Extracting useful data from All_Tabs and storing them into data-frames
-  TimeBooking.df <- All_Tabs$activitydata[,c("FK_PROJECT","FK_WORKER","Timespent_billable","BookedDate")]
-  InvoicesPkgLvl.df <- All_Tabs$financeposition # Amounts in invoices at work package level
-  Workers.df <- All_Tabs$worker # List of workers
+  TimeBooking.df <- All_Tabs$activitydata[,c("FK_PROJECT","FK_WORKER","Timespent_billable","BookedDate", "INCOMEFROMINVOICE_BILLABLE")]
 
   # 1) FILTER INPUT DATASET BASED ON OPTIONAL ARGUMENTS ####
   # -------------------------------------------------------------------------- #
@@ -63,12 +61,13 @@ filterData <- function(Data, All_Tabs, DLF = F, Divisions = NA, DateFrom = NA, S
 
   # aggregating the project dataframe with corresponding timebookings
   Data <- dplyr::left_join(Data, TimeBooking.df, by = c("UniqueCode" = "FK_PROJECT")) %>%
-    dplyr::rename(Workers = FK_WORKER, TimeSpent = "Timespent_billable") # renaming new columns
+    dplyr::rename(Workers = "FK_WORKER", TimeSpent = "Timespent_billable") %>%  # renaming new columns
+    dplyr::mutate(HourlyCosts = INCOMEFROMINVOICE_BILLABLE) %>%
+    dplyr::select(-INCOMEFROMINVOICE_BILLABLE)
   Data <- Data[,c(1:19,28,20,21,29,27,22:26)]# Reordering columns
-  # See: https://www.rdocumentation.org/packages/dplyr/versions/0.7.8/topics/join
 
   # Replacing the Workers code by names
-  Data <- dplyr::left_join(Data, Workers.df[,c("PK_Worker","ShowName")], by = c("Workers" = "PK_Worker"))
+  Data <- dplyr::left_join(Data, All_Tabs$worker[,c("PK_Worker","ShowName")], by = c("Workers" = "PK_Worker"))
   Data$Workers <- Data$ShowName
   Data <- Data[,-dim(Data)[2]]
 
@@ -89,21 +88,23 @@ filterData <- function(Data, All_Tabs, DLF = F, Divisions = NA, DateFrom = NA, S
   Data <- Data %>% dplyr::mutate(ProdDate = dplyr::coalesce(ProdDate,ProdDateNew))
   Data <- Data[,-dim(Data)[2]]
 
-  # 3) EXTRACTING COSTS AND DATASET CLEANING ####
+  # 3) EXTRACTING FIXED COSTS AND DATASET CLEANING ####
   # -------------------------------------------------------------------------- #
+  # Took the gross value (SUMBRUTTO) since to determine if DLF is reached, VTA should not be included
+  # FYI: For an unknown reason, SUMBRUTTO contains money spent + money budgeted ONLY FOR hourly costs
+  # In either $financeposition or $financearticle...
+  # BILLINGTYPE --> 0 = Fixed costs
+  #                 3 & 4 = Hourly costs
 
-  # FIXED COSTS
-  # Isolating Database Set-up Database Locking and Archiving invoices
-  # NUMBER = 050.3 or FK_FINANCEARTICLE = 246311221 --> Data Locking and
-  # Took the gross value (BRUTTO) since VTA is billed to customers
-  Idx <- (InvoicesPkgLvl.df$NUMBER=="050.1" | InvoicesPkgLvl.df$NUMBER=="050.3")
-  InvoicesPkgLvl.df = InvoicesPkgLvl.df[Idx,] # Removing useless lines
-  if (!is.na(DateFrom)){InvoicesPkgLvl.df <- InvoicesPkgLvl.df[as.Date(InvoicesPkgLvl.df$CREATEDATE)-DateFrom>0,]}
-  MatchIdx <- match(InvoicesPkgLvl.df$FK_PROJECT,Data$UniqueCode)
-  InvoicesPkgLvl.df <- InvoicesPkgLvl.df[!is.na(MatchIdx),]
-  MatchIdx <- MatchIdx[!is.na(MatchIdx)]
-  SumBrutto <- unlist(lapply(split(seq_along(MatchIdx), MatchIdx), function(x) {sum(InvoicesPkgLvl.df$SUMBRUTTO[x])}))
-  Data[as.integer(names(SumBrutto)),"FixedCosts"] <- SumBrutto
+  # Fixed costs
+  InvoicesPkgLvl <- All_Tabs$financeposition[All_Tabs$financeposition$BILLINGTYPE == 0,] %>%
+    dplyr::group_by(FK_PROJECT) %>%
+    dplyr::summarize(SUMBRUTTO=sum(SUMBRUTTO, na.rm=T))
+  Data <- dplyr::left_join(Data, InvoicesPkgLvl, by = c("UniqueCode" = "FK_PROJECT")) %>%
+    dplyr::mutate(FixedCosts = SUMBRUTTO) %>%
+    dplyr::select(-SUMBRUTTO)
+  Data$FixedCosts <- replace(Data$FixedCosts, duplicated(Data$UniqueCode), NA)
+  Data$MoneyBudget <- replace(Data$MoneyBudget, duplicated(Data$UniqueCode), NA)
 
   # Changing data format
   Cols <- c("ProjectID","Service","CDMS","State","DLFReached","CustomerID","Manager")
