@@ -42,6 +42,6 @@ ProjStr <- c("P-","C-","I-","IB-","FTE-")
 
 # values to show, or not show, these will be the 'choices' and 'selected' values
 # for the checkboxGroupInput()
-AllRows <- 1:dim(Data)[2]
-names(AllRows) <-colnames(Data)
+AllRows <- 1:(dim(Data)[2]-1)
+names(AllRows) <- colnames(Data)[-dim(Data)[2]]
 SelectRows <- AllRows[c(1,3,4,8,18,20,21,22,23,24)]

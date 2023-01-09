@@ -296,21 +296,23 @@ server <- function(input, output) { # Assemble inputs into outputs
     # Columns are adjusted based on checkboxes
     Cols <- c(colnames(DataUpTab[as.integer(input$tablevars)]),"Fraction","Levels")
 
+    # Rows are adjusted based on input
+    ifelse(input$tabledata == "Yes", Rows <- 1:dim(DataUpTab)[1], Rows <- which(!DataUpTab$Filt))
+
     # By default return the whole table and filter if node is selected
     if (is.null(input$node_id)) {
-        BuildTable(DataUpTab[,Cols])
+        BuildTable(DataUpTab[Rows,Cols])
 
       } else {
         # If one node is selected
         if(grepl("P-",input$node_id)) {
-          IdxProj <- DataUpTab$ProjectIDs==input$node_id
-          BuildTable(DataUpTab[IdxProj,Cols])
+          Idx <- which(DataUpTab$ProjectIDs==input$node_id)
 
         # If one worker is selected
         } else {
-          IdxWorker <- grepl(input$node_id,DataUpTab$Workers,ignore.case = T)
-          BuildTable(DataUpTab[IdxWorker,Cols])
+          Idx <- which(grepl(input$node_id,DataUpTab$Workers,ignore.case = T))
         }
+        BuildTable(DataUpTab[intersect(Idx,Rows), Cols])
       }
    })
 

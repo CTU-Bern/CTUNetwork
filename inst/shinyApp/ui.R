@@ -50,7 +50,8 @@ ui <- shinydashboard::dashboardPage(
                solidHeader = TRUE,
                collapsible = TRUE,
                column(10, visNetwork::visNetworkOutput("mynetworkid", height = "1200")),
-               column(2, style = "height:150px; ", shiny::plotOutput("mylegend", height = "400"))
+               column(2, style = "height:150px; ",
+                      shiny::plotOutput("mylegend", height = "400"))
   )),
 
   # 2. Bar chart grouped (for selected node)
@@ -90,6 +91,8 @@ ui <- shinydashboard::dashboardPage(
                                    choices = AllRows,
                                    selected = SelectRows,
                                    inline = TRUE),
+                shiny::selectInput("tabledata", label = h3("Show individual time bookings"),
+                                   choices = c("Yes", "No"), selected = "Yes", width = "20%"),
                 DT::dataTableOutput("DataTable", width = "99%")))
   )
 )
