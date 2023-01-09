@@ -106,10 +106,6 @@ server <- function(input, output) { # Assemble inputs into outputs
     }
 
     # Computing different calculations based on filtering parameters
-    # THERE SEEMS TO BE A PROBLEM HERE:
-    # The MoneySpent over project doesn't make sense when TimeBooking filters are applied
-    # DataUp <- DataUp[is.na(DataUp$BookedDate) | DataUp$BookedDate %in% as.Date("2020-01-01"):as.Date("2022-12-29"),]
-    # Project P-0634 as example: 908.10000 (DM) + 35910.000000 (Cloud) NOT EQUAL TO 95078.100000 (Total)
     DataUp <- Calculations(DataUp)
 
     ## Preparing data for network
