@@ -45,3 +45,11 @@ ProjStr <- c("P-","C-","I-","IB-","FTE-")
 AllRows <- 1:(dim(Data)[2]-1)
 names(AllRows) <- colnames(Data)[-dim(Data)[2]]
 SelectRows <- AllRows[c(1,3,4,8,18,20,21,22,23,24)]
+
+# Load default parameters
+if (file.exists("www/Defaults.rds")) {
+  Defaults <- readRDS("www/Defaults.rds")
+} else {
+  Defaults <- list(physics = "Yes",
+                   layout = "Layout on sphere",
+                   solver = "hierarchicalRepulsion")}

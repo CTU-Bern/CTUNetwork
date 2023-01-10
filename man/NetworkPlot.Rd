@@ -7,12 +7,18 @@ Tutorials:
 https://www.statworx.com/en/content-hub/blog/interactive-network-visualization-with-r
 http://datastorm-open.github.io/visNetwork/shiny.html}
 \usage{
-NetworkPlot(nodes, edges)
+NetworkPlot(
+  nodes,
+  edges,
+  params = list(layout = "layout_on_sphere", physics = T)
+)
 }
 \arguments{
 \item{nodes}{dataframe containing nodes data, see visNetwork()}
 
 \item{edges}{dataframe containing edges data, see visNetwork()}
+
+\item{params}{list of parameters to control graph behaviour, see visNetwork()}
 }
 \description{
 Network plot function - Build the network

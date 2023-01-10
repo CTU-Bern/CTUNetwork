@@ -1,5 +1,6 @@
 # CTU Network Shiny app server
 #' @importFrom shinyjs reset
+#' @importFrom stringr str_replace_all
 #' @importFrom cowplot get_legend
 #' @importFrom scales rescale
 #' @importFrom foreach foreach
@@ -9,6 +10,7 @@
 #' @import grid
 #' @import ggplot2
 #' @import shiny
+#' @import shinyalert
 #' @export
 
 require(CTUNetwork)
@@ -169,9 +171,18 @@ server <- function(input, output) { # Assemble inputs into outputs
   # ----
   ### RENDERING PLOTS ###
 
+  # Retrieve graph parameters from UI
+  GraphParams <- shiny::reactive(
+    list(layout = tolower(ifelse(input$layout == "Layout Reingold Tilford",
+                                 stringr::str_replace_all(input$layout, " ","."),
+                                 stringr::str_replace_all(input$layout, " ","_"))),
+         physics = ifelse(input$physics == "Yes", T, F),
+         solver = input$solver)
+  )
+
   # 1. Network plot
   output$mynetworkid <- visNetwork::renderVisNetwork(
-    NetworkPlot(AllData()$Nodes, AllData()$Edges)
+    NetworkPlot(AllData()$Nodes, AllData()$Edges, params = GraphParams())
   )
 
   # 2. Legend
@@ -321,6 +332,32 @@ server <- function(input, output) { # Assemble inputs into outputs
   # See: https://stackoverflow.com/questions/54347972/reset-action-button-output-in-shiny
   shiny::observeEvent(input$reset, {
     shinyjs::reset()
+  })
+
+  # Saving parameters as defaults
+  shiny::observeEvent(input$defaults, {
+    Defaults <- list(physics = input$physics,
+                     layout = input$layout,
+                     solver = input$solver)
+    saveRDS(Defaults, "www/Defaults.rds")
+
+    # Shiny alert to confirm defaults are saved
+    shinyalert::shinyalert(
+      title = "Defaults saved",
+      text = "Defaults were successfully saved",
+      size = "xs",
+      closeOnEsc = TRUE,
+      closeOnClickOutside = TRUE,
+      html = FALSE,
+      type = "success",
+      showConfirmButton = FALSE,
+      # showCancelButton = FALSE,
+      # confirmButtonText = "OK",
+      # confirmButtonCol = "#AEDEF4",
+      timer = 2000,
+      imageUrl = "",
+      animation = TRUE
+    )
   })
 
   # Datatable box title

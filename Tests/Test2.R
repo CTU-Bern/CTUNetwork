@@ -29,7 +29,7 @@ server <- function(input, output) {
   observeEvent(input$open, {
     shinyjs::runjs("openBox('x')")
   }, ignoreNULL = TRUE)
-  
+
   observeEvent(input$close, {
     shinyjs::runjs("closeBox('x')")
   }, ignoreNULL = TRUE)
