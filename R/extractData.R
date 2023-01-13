@@ -43,7 +43,7 @@ extractData <- function(All_Tabs){
                          CustomerID = Projects.df$FK_CUSTOMER,
                          Customer = Projects.df$FK_CUSTOMER,
                          Contact = Projects.df$FK_CUSTOMERCONTACT,
-                         Sponsor = Projects.df$cf_sponsor, # Sponsor notes
+                         Sponsor = Projects.df$`cf_sponsor...187`, # Sponsor notes (the column label recently changed, reason is unknown)
                          DMNotes = Projects.df$CUSTOMFIELDVALUES, # Data Management notes
                          DLFSupport = Projects.df$cf_dlf_data_management_support,
                          DLFReached = rep(NA,dim(Projects.df)[1]),
