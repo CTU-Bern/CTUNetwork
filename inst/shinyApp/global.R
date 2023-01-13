@@ -1,11 +1,11 @@
 # CTU Network Shiny global variables
 #' @importFrom remotes install_local
-#' @importFrom  stringr str_remove
+#' @importFrom pf getPFData
 #' @export
 
 # Load/install the local PF package
-if (!"pf" %in% installed.packages()) {remotes::install_github("CTU-Bern/pf")}
-library("pf")
+# if (!"pf" %in% installed.packages()) {remotes::install_github("CTU-Bern/pf")}
+# library("pf")
 library("CTUNetwork")
 
 # Retrieve data from ProjectFacts
