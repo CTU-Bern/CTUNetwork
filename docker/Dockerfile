@@ -23,7 +23,7 @@ RUN apt-get update && \
 # start in at level above package
 ## app folder
 COPY ./inst/shinyApp ./app
-COPY CTUNetwork ./CTUNetwork
+COPY ./ ./CTUNetwork
 
 # install deps
 RUN Rscript -e 'install.packages("remotes")'
