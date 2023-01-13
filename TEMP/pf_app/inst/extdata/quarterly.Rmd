@@ -1,0 +1,163 @@
+---
+title: "CTU quarterly report `r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, 
+                      warning = FALSE, 
+                      message = FALSE,
+                      echo = FALSE)
+library(pf)
+library(tidyverse)
+```
+
+```{r, include=FALSE}
+all_tabs <- getPFData()
+```
+
+
+
+```{r dataprep, echo=FALSE}
+y <- prepTime(all_tabs) %>% 
+  mutate(money = billable_time / 60 * UNITPRICE) %>% 
+  left_join(all_tabs$project %>% select(cf_applicable_ordinance_2, PK_Project),
+            by = c("top_project" = "PK_Project")) %>% 
+  mutate(ordinance = str_replace(cf_applicable_ordinance_2, "If ", ""),
+         ordinance = str_replace(ordinance, "/.{1,}$", "")) %>% 
+  group_by(ctu_projectName, projnum, ctu_division, projecttype, year, q_in_year, billable, ordinance) %>% 
+  summarize(across(c(billable_time, nonbillable_time, money), sum, na.rm = TRUE),
+            ) %>% 
+  mutate(across(ends_with("time"), ~ .x / 60)) %>% 
+  filter(year > 2019) %>% 
+  left_join(projectSize(all_tabs)) %>%
+  mutate(quarter = year + ((1/4 * q_in_year) - 0.25)) %>% 
+  ungroup() %>% 
+  mutate(ordinance = ifelse(!is.na(ordinance), ordinance, "unknown"))
+
+z <- y %>% 
+  group_by(ctu_division, projecttype, year, q_in_year, quarter, billable, ordinance, size) %>% 
+  summarize(across(c(billable_time, nonbillable_time, money), sum, na.rm = TRUE),
+            n = nrow(.data))
+
+```
+### Money
+#### Money by ordinance
+
+```{r}
+z  %>% 
+  ggplot(aes(x = quarter, y = money, fill = ctu_division, alpha = ordinance)) +
+  geom_col() +
+  coord_flip() +
+  scale_alpha_manual(values = c(1, .8, .6, .4)) +
+  guides(alpha = guide_legend(title = "Ordinance", nrow = 2, byrow = TRUE, reverse = TRUE),
+         fill = guide_legend(title = "Division", nrow = 1, byrow = TRUE, reverse = TRUE)) +
+  theme(panel.background = element_rect(fill = NA),
+        legend.position = "bottom", 
+        legend.box = "vertical")
+
+```
+
+#### Money by project size
+
+```{r}
+z  %>% 
+  ggplot(aes(x = quarter, y = money, fill = ctu_division, alpha = size)) +
+  geom_col() +
+  coord_flip() +
+  scale_alpha_manual(values = c(1, .8, .6)) +
+  guides(alpha = guide_legend(title = "Size", nrow = 1, byrow = TRUE, reverse = TRUE),
+         fill = guide_legend(title = "Division", nrow = 1, byrow = TRUE, reverse = TRUE)) +
+  theme(panel.background = element_rect(fill = NA),
+        legend.position = "bottom", 
+        legend.box = "vertical")
+```
+
+### Billable time
+#### Billable time by ordinance
+
+```{r}
+z  %>% 
+  ggplot(aes(x = quarter, y = billable_time, fill = ctu_division, alpha = ordinance)) +
+  geom_col() +
+  coord_flip() +
+  scale_alpha_manual(values = c(1, .8, .6, .4)) +
+  guides(alpha = guide_legend(title = "Ordinance", nrow = 2, byrow = TRUE, reverse = TRUE),
+         fill = guide_legend(title = "Division", nrow = 1, byrow = TRUE, reverse = TRUE)) +
+  theme(panel.background = element_rect(fill = NA),
+        legend.position = "bottom", 
+        legend.box = "vertical")
+
+```
+
+#### Billable time by project size
+
+```{r}
+z  %>% 
+  ggplot(aes(x = quarter, y = billable_time, fill = ctu_division, alpha = size)) +
+  geom_col() +
+  coord_flip() +
+  scale_alpha_manual(values = c(1, .8, .6)) +
+  guides(alpha = guide_legend(title = "Size", nrow = 1, byrow = TRUE, reverse = TRUE),
+         fill = guide_legend(title = "Division", nrow = 1, byrow = TRUE, reverse = TRUE)) +
+  theme(panel.background = element_rect(fill = NA),
+        legend.position = "bottom", 
+        legend.box = "vertical")
+```
+
+### Non-Billable time
+
+(includes consultings)
+
+#### Non-Billable time by ordinance
+
+```{r}
+z  %>% 
+  ggplot(aes(x = quarter, y = nonbillable_time, fill = ctu_division, alpha = ordinance)) +
+  geom_col() +
+  coord_flip() +
+  scale_alpha_manual(values = c(1, .8, .6, .4)) +
+  guides(alpha = guide_legend(title = "Ordinance", nrow = 2, byrow = TRUE, reverse = TRUE),
+         fill = guide_legend(title = "Division", nrow = 1, byrow = TRUE, reverse = TRUE)) +
+  theme(panel.background = element_rect(fill = NA),
+        legend.position = "bottom", 
+        legend.box = "vertical")
+
+```
+
+#### Non-Billable time by project size
+
+```{r}
+z  %>% 
+  ggplot(aes(x = quarter, y = nonbillable_time, fill = ctu_division, alpha = size)) +
+  geom_col() +
+  coord_flip() +
+  scale_alpha_manual(values = c(1, .8, .6)) +
+  guides(alpha = guide_legend(title = "Size", nrow = 1, byrow = TRUE, reverse = TRUE),
+         fill = guide_legend(title = "Division", nrow = 1, byrow = TRUE, reverse = TRUE)) +
+  theme(panel.background = element_rect(fill = NA),
+        legend.position = "bottom", 
+        legend.box = "vertical")
+```
+
+
+#### To explore for yourself...
+
+##### Aggregated to division, project type, quarter in year, billable (Y/N), ordinance, and size
+
+```{r}
+DT::datatable(z, filter = "top")
+```
+
+
+##### Aggregated to project, division, project type, quarter in year, billable (Y/N), ordinance, and size
+
+```{r}
+DT::datatable(y, filter = "top")
+```
+
+
+
+
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
