@@ -14,6 +14,7 @@ library("CTUNetwork")
 if (grepl("windows", Sys.info()[1], ignore.case = TRUE)){
   All_Tabs <- pf::getPFData()
 } else {
+  print(getwd())
   All_Tabs <- pf::getPFData(file = "/media/sf_SharedFolderVM/pf_tabs.rds")
 }
 # Only keeping useful information from All_Tabs
