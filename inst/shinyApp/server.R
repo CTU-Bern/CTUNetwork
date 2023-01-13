@@ -17,7 +17,7 @@ require(CTUNetwork)
 require(ggplot2)
 
 # Server
-server <- function(input, output) { # Assemble inputs into outputs
+server <- function(input, output, session) { # Assemble inputs into outputs
 
   # Preallocate the FiltIdx variable
   FiltIdx <- vector(mode = "logical", length = dim(Data)[1])
@@ -364,4 +364,7 @@ server <- function(input, output) { # Assemble inputs into outputs
   output$TableTitle <- shiny::renderText({
     paste("Data table:",ifelse(is.null(input$node_id),"All",input$node_id))
   })
+
+  # End session when App is stopped
+  session$onSessionEnded(stopApp)
 }
