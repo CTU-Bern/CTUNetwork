@@ -25,6 +25,9 @@ RUN apt-get update && \
 COPY ./inst/shinyApp ./app
 COPY ./ ./CTUNetwork
 
+# making the backend data file accessible
+ADD /media/sf_SharedFolderWM/pf_tabs.rds /app
+
 # install deps
 RUN Rscript -e 'install.packages("remotes")'
 RUN Rscript -e 'remotes::install_deps("CTUNetwork", dependencies = TRUE)'
