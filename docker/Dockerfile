@@ -22,9 +22,7 @@ RUN apt-get update && \
 # copy necessary files
 # start in at level above package
 ## app folder
-COPY CTUNetwork/inst/shinyApp ./global
-COPY CTUNetwork/inst/shinyApp ./server
-COPY CTUNetwork/inst/shinyApp ./ui
+COPY ../inst/shinyApp ./app
 COPY CTUNetwork ./CTUNetwork
 
 # install deps
