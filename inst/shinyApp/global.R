@@ -6,6 +6,7 @@
 # Load/install the local PF package
 # if (!"pf" %in% installed.packages()) {remotes::install_github("CTU-Bern/pf")}
 # library("pf")
+install.packages("CTUNetwork")
 library("CTUNetwork")
 
 # Retrieve data from ProjectFacts
