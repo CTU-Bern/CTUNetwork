@@ -1,17 +1,17 @@
 # CTU Network Shiny global variables
 #' @importFrom remotes install_local
+#' @importFrom  stringr str_remove
 #' @export
 
 # Load/install the local PF package
-if (!"pf" %in% installed.packages()) {remotes::install_local("/TEMP/pf_app/")}
-# if (!"pf" %in% installed.packages()) {remotes::install_local("R:/Projectfacts/ODBC/pf_app/")}
+if (!"pf" %in% installed.packages()) {remotes::install_github("CTU-Bern/pf")}
 # library("pf")
 library("CTUNetwork")
 
 # Retrieve data from ProjectFacts
 # THIS SHOULD ULTIMATELY BE CHANGED FOR "NULL" (To load from ODBC)
 # All_Tabs <- getPFData(NULL)
-All_Tabs <- pf::getPFData(file = "/TEMP/pf_tabs.rds")
+All_Tabs <- pf::getPFData(file = paste0(getwd() %>% stringr::str_remove("shinyApp"),"TEMP/pf_tabs.rds"))
 
 # Only keeping useful information from All_Tabs
 # $activitycategory = activity types - e.g. billable, non-billable
