@@ -365,4 +365,7 @@ server <- function(input, output) { # Assemble inputs into outputs
     paste("Data table:",ifelse(is.null(input$node_id),"All",input$node_id))
   })
 
+  # Stop App when session is ended
+  session$onSessionEnded(stopApp)
+
 }
