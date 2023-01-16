@@ -26,7 +26,7 @@ COPY ./inst/shinyApp ./app
 COPY ./ ./CTUNetwork
 
 # making the backend data file accessible
-COPY /media/sf_SharedFolderVM/pf_tabs.rds /app/
+COPY ./TEMP/pf_tabs.rds /app/
 
 # install deps
 RUN Rscript -e 'install.packages("remotes")'
