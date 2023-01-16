@@ -6,7 +6,7 @@
 # Load/install the local PF package
 # if (!"pf" %in% installed.packages()) {remotes::install_github("CTU-Bern/pf")}
 # library("pf")
-# library("CTUNetwork")
+library("CTUNetwork")
 
 # Retrieve data from ProjectFacts
 # THIS SHOULD ULTIMATELY BE CHANGED FOR "NULL" (To load from ODBC)
