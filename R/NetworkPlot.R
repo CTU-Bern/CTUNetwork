@@ -8,6 +8,7 @@
 #' @param params list of parameters to control graph behaviour, see visNetwork()
 #'
 #' @import visNetwork
+#' @import igraph
 #' @export
 #'
 #' @examples
