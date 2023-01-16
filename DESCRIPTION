@@ -30,8 +30,7 @@ Imports:
     shinyWidgets,
     stringr,
     tidyr,
-    visNetwork,
-    igraph
+    visNetwork
 Depends:
     foreach,
     magrittr
