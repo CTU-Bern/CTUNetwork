@@ -19,7 +19,6 @@ Imports:
     ggplot2,
     grid,
     gridExtra,
-    igraph,
     lubridate,
     pf,
     reshape2,
@@ -31,8 +30,9 @@ Imports:
     shinyWidgets,
     stringr,
     tidyr,
-    visNetwork
+    visNetwork,
+    igraph
 Depends:
     foreach,
-    magrittr,
+    magrittr
 Remotes: CTU-Bern/pf
