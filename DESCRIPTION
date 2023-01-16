@@ -28,6 +28,7 @@ Imports:
     shinydashboard,
     shinydashboardPlus,
     shinyjs,
+    shinyWidgets,
     stringr,
     tidyr,
     visNetwork
