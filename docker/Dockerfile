@@ -12,7 +12,8 @@ RUN apt-get update -qq && apt-get -y --no-install-recommends install \
     libssh2-1-dev \
     unixodbc-dev \
     libcurl4-openssl-dev \
-    libssl-dev
+    libssl-dev \
+    libmkl-rt
 
 ## update system libraries
 RUN apt-get update && \
