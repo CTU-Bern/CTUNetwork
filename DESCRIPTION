@@ -26,6 +26,7 @@ Imports:
     scales,
     shiny,
     shinydashboard,
+    shinydashboardPlus,
     shinyjs,
     stringr,
     tidyr,
