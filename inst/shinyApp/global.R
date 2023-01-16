@@ -1,12 +1,11 @@
 # CTU Network Shiny global variables
 #' @importFrom remotes install_local
 #' @importFrom pf getPFData
+#' @import CTUNetwork
 #' @export
 
-# Load/install the local PF package
-# if (!"pf" %in% installed.packages()) {remotes::install_github("CTU-Bern/pf")}
-# library("pf")
-library("CTUNetwork")
+# Load the package functions
+# library("CTUNetwork")
 
 # Retrieve data from ProjectFacts
 # THIS SHOULD ULTIMATELY BE CHANGED FOR "NULL" (To load from ODBC)
@@ -28,10 +27,10 @@ All_Tabs = All_Tabs[c("activitydata","customer","crmkontakt","financeposition",
                       "project","projectstatedefinition","worker")]
 
 # Retrieve data
-Data <- extractData(All_Tabs)
+Data <- CTUNetwork::extractData(All_Tabs)
 
 # Filter data
-Data <- filterData(Data, All_Tabs)
+Data <- CTUNetwork::filterData(Data, All_Tabs)
 
 # Filtering the lines corresponding to the project level (the aim is to separate for each division)
 Data$Filt <- grepl("\\.|C-", Data$ProjectID)
