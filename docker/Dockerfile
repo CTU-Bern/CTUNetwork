@@ -29,7 +29,7 @@ COPY ./ ./CTUNetwork
 COPY ./TEMP/pf_tabs.rds /app/
 
 # install deps
-RUN Rscript -e 'install.packages("remotes")'
+RUN Rscript -e 'install.packages(c("remotes", "igraph"))'
 RUN Rscript -e 'remotes::install_deps("CTUNetwork", dependencies = TRUE)'
 RUN Rscript -e 'remotes::install_local("CTUNetwork")'
 
