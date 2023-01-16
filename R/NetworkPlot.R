@@ -16,7 +16,7 @@
 NetworkPlot <- function(nodes, edges, params = list(layout = "layout_on_sphere", physics = T)){
 
   # To avoid error: "the function needs igraph package to compute layout"
-  library("igraph")
+  # library("igraph")
 
   # Create the initial plot
   Plot <- visNetwork::visNetwork(nodes, edges,
