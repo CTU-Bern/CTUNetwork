@@ -16,6 +16,9 @@
 
 NetworkPlot <- function(nodes, edges, params = list(layout = "layout_on_sphere", physics = T)){
 
+  # To avoid error: "the function needs igraph package to compute layout"
+  require("igraph")
+
   # Create the initial plot
   Plot <- visNetwork::visNetwork(nodes, edges,
                 main = list(text="CTU - PROJECTFACTS NETWORK", style="font-size:25px; color: #0073b7; text-align: center;"),
