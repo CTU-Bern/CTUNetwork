@@ -13,7 +13,7 @@ RUN apt-get update -qq && apt-get -y --no-install-recommends install \
     unixodbc-dev \
     libcurl4-openssl-dev \
     libssl-dev \
-    libmkl-rt
+    gfortran-7
 
 ## update system libraries
 RUN apt-get update && \
