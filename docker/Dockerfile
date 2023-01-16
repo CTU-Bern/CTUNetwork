@@ -16,7 +16,8 @@ RUN apt-get update -qq && apt-get -y --no-install-recommends install \
     libblas-dev \
     liblapack-dev \
     libarpack2-dev \
-    libgmp-dev
+    libgmp-dev \ 
+    libglpk-dev
 
 ## update system libraries
 RUN apt-get update && \
