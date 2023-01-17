@@ -23,7 +23,14 @@ RUN apt-get update -qq && apt-get -y --no-install-recommends install \
     gcc \
     unixodbc \
     odbcinst \
-    unixodbc-dev
+    unixodbc-dev \
+    curl
+
+# Install Docker compose
+RUN curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+
+# Change file permission
+RUN chmod +x /usr/local/bin/docker-compose
 
 ## Update system libraries
 RUN apt-get update && \
@@ -51,7 +58,7 @@ COPY ./inst/shinyApp ./app
 COPY ./ ./CTUNetwork
 
 # Making the backend data file accessible
-COPY ./TEMP/pf_tabs.rds /app/
+COPY /Documents/pf_tabs.rds /app/
 
 # Install deps
 RUN Rscript -e 'install.packages(c("remotes", "igraph"))'
