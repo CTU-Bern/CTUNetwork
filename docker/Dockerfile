@@ -18,6 +18,7 @@ RUN apt-get update -qq && apt-get -y --no-install-recommends install \
     libarpack2-dev \
     libgmp-dev \ 
     libglpk-dev \
+    git \
     cmake \
     gcc \
     unixodbc \
