@@ -2,3 +2,4 @@
 Tests/
 inst/shinyApp/www/Defaults.rds
 .Rhistory
+docker/docker-compose.yml
