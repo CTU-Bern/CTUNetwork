@@ -33,10 +33,10 @@ RUN sudo install lib64/libmaodbc.so /usr/lib/
 RUN sudo install -d /usr/lib/mariadb/ \
     /usr/lib/mariadb/plugin/
 RUN sudo install lib/mariadb/plugin/auth_gssapi_client.so /usr/lib/mariadb/plugin/ \
-    lib/mariadb/plugin/caching_sha2_password.so /usr/lib/mariadb/plugin/ \
-    lib/mariadb/plugin/client_ed25519.so /usr/lib/mariadb/plugin/ \
-    lib/mariadb/plugin/dialog.so /usr/lib/mariadb/plugin/ \
-    lib/mariadb/plugin/mysql_clear_password.so /usr/lib/mariadb/plugin/ \
+    lib/mariadb/plugin/caching_sha2_password.so /usr/lib/mariadb/plugin/
+    lib/mariadb/plugin/client_ed25519.so /usr/lib/mariadb/plugin/
+    lib/mariadb/plugin/dialog.so /usr/lib/mariadb/plugin/
+    lib/mariadb/plugin/mysql_clear_password.so /usr/lib/mariadb/plugin/
     lib/mariadb/plugin/sha256_password.so /usr/lib/mariadb/plugin/
 RUN cd -
 
