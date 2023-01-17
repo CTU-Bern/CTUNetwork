@@ -35,7 +35,7 @@ NetworkPlot <- function(nodes, edges, params = list(layout = "layout_on_sphere",
     visNetwork::visPhysics(solver = params$solver, hierarchicalRepulsion = list(springLength = 850, nodeDistance = 90), stabilization = "onlyDynamicEdges") %>%
     visNetwork::visNodes(shapeProperties = list(interpolation = F)) %>%
     visNetwork::visEdges(smooth = F, color=list(color = "#848484", highlight = "#000000")) %>%
-    visNetwork::visConfigure(enabled = TRUE, filter = "physics", container = "physics", showButton = FALSE) %>%
+    # visNetwork::visConfigure(enabled = TRUE, filter = "physics", container = "physics", showButton = FALSE) %>%
     visNetwork::visEvents(selectNode = "function(nodes) {
                     Shiny.onInputChange('node_id', nodes.nodes);
                     openBox('Bargraphs');
