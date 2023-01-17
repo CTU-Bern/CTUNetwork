@@ -25,7 +25,7 @@ if (grepl("windows", Sys.info()[1], ignore.case = TRUE)){
     All_Tabs <- pf::getPFData()
   }
 } else {
-  print(paste0("the current directory is: ",getwd()))
+  # print(paste0("the current directory is: ",getwd()))
   All_Tabs <- pf::getPFData(file = "pf_tabs.rds")
 }
 # Only keeping useful information from All_Tabs
