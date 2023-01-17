@@ -7,6 +7,7 @@
 #' @importFrom foreach "%do%"
 #' @importFrom tidyr unite
 #' @importFrom stringr str_replace
+#' @importFrom janitor remove_empty
 #' @import dplyr
 #' @export
 #'
@@ -26,7 +27,7 @@ extractData <- function(All_Tabs){
   #   All_Tabs$projectstatedefinition # Explanations related to projects state code
   #   worker # List of workers
   #   project # List of projects, work packages
-  Projects.df <- All_Tabs$project[,colSums(is.na(All_Tabs$project))<nrow(All_Tabs$project)] # Removing columns containing only NAs
+  Projects.df <- janitor::remove_empty(All_Tabs$project, which="cols", quiet = TRUE) # Removing columns containing only NAs
 
   # 2) BUILD MAIN DATASET ####
   # -------------------------------------------------------------------------- #

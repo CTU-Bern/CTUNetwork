@@ -58,6 +58,7 @@ ui <- shinydashboard::dashboardPage(
                                               fill = TRUE,
                                               animation = "smooth",
                                               plain = TRUE),
+                                          shinydashboard::box(id = "physics"),
                                           shiny::actionButton("defaults", "Save as defaults", icon = shiny::icon("floppy-disk"))
                                           ))),
 
