@@ -216,6 +216,7 @@ server <- function(input, output, session) { # Assemble inputs into outputs
       Plot.df <- AllData()$DataPlot[AllData()$DataPlot$Workers %in% input$node_id,]
     } else {
       Plot.df <- AllData()$DataPlot[AllData()$DataPlot[paste0("Project",input$projectlab)]==input$node_id,]
+      Plot.df <- Plot.df[!is.na(Plot.df$Workers),]
     })
 
   # 3.1 Grouped nodes
@@ -339,6 +340,7 @@ server <- function(input, output, session) { # Assemble inputs into outputs
     Defaults <- list(physics = input$physics,
                      layout = input$layout,
                      solver = input$solver)
+    print(paste0("The current working directory is: ", getwd()))
     saveRDS(Defaults, "www/Defaults.rds")
 
     # Shiny alert to confirm defaults are saved
