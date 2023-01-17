@@ -32,7 +32,7 @@ RUN apt-get update && \
 
 ## Cloning the MariaDB Connector/ODBC Git Repository
 RUN git clone https://github.com/MariaDB/mariadb-connector-odbc.git
-RUN cd mariadb-connector-odbc
+RUN WORKDIR "mariadb-connector-odbc"
 
 ## Build MariaDB Connector/ODBC from the git repository
 RUN cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCONC_WITH_UNIT_TESTS=Off -DCONC_WITH_MSI=OFF -DCMAKE_INSTALL_PREFIX=/usr/local .
