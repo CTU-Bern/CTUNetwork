@@ -53,7 +53,8 @@ SelectRows <- AllRows[c(1,3,4,8,18,20,21,22,23,24)]
 
 # Load default parameters
 if (file.exists("www/Defaults.rds")) {
-  Defaults <- readRDS("www/Defaults.rds")
+  LibPath <- .libPaths()[1] # There may be more than one
+  Defaults <- readRDS(paste0(LibPath,"/CTUNetwork/shinyApp/www/Defaults.rds"))
 } else {
   Defaults <- list(physics = "Yes",
                    layout = "Layout on sphere",
