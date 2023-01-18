@@ -95,18 +95,21 @@ NetworkPlot <- function(nodes, edges, params = list(layout = "layout_on_sphere",
                                               avoidOverlap = params$hierarchicalRepulsion$avoidOverlap))
   }
 
-    # Add options and data
-    Plot %>%
-    visNetwork::visOptions(highlightNearest = T, nodesIdSelection = list(enabled = TRUE, main = "Select Worker/Project"),
-                           selectedBy = list(variable="group", main = "Select State")) %>% #, multiple=T
-      visNetwork::visNodes(shapeProperties = list(interpolation = F)) %>%
-      visNetwork::visEdges(smooth = F, color=list(color = "#848484", highlight = "#000000")) %>%
-      visNetwork::visEvents(selectNode = "function(nodes) {
-                      Shiny.onInputChange('node_id', nodes.nodes);
-                      openBox('Bargraphs');
-                      ;}",
-                            deselectNode = "function(){
-                      closeBox('Bargraphs');
-                      }")
+  # Add options and data
+  Plot %>%
+  visNetwork::visOptions(highlightNearest = T, nodesIdSelection = list(enabled = TRUE, main = "Select Worker/Project"),
+                         selectedBy = list(variable="group", main = "Select State")) %>% #, multiple=T
+    visNetwork::visNodes(shapeProperties = list(interpolation = F)) %>%
+    visNetwork::visEdges(smooth = F, color=list(color = "#848484", highlight = "#000000")) %>%
+
+    # Enable to open the box based on node's press
     # See: https://stackoverflow.com/questions/74768667/visnetwork-visevents-javascript-to-uncollapse-box
+    visNetwork::visEvents(selectNode = "function(nodes) {
+                    Shiny.onInputChange('node_id', nodes.nodes);
+                    openBox('Bargraphs');
+                    ;}",
+                          deselectNode = "function(){
+                    closeBox('Bargraphs');
+                    }")
+
 }
