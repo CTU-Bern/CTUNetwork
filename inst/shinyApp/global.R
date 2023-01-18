@@ -11,19 +11,19 @@ library("CTUNetwork")
 if (grepl("windows", Sys.info()[1], ignore.case = TRUE)){
 
   # Projectfacts data loaded through ODBC connection (if available)
-  Tryclass <- try({
-    All_Tabs <- pf::getPFData(NULL)
+  # Tryclass <- try({
+    # All_Tabs <- pf::getPFData(NULL)
     # add custom fields
     # All_Tabs$customer <- pf::decodeCustomFields(All_Tabs$customer, All_Tabs$customfields)
-    All_Tabs$project <- pf::decodeCustomFields(All_Tabs$project, All_Tabs$customfields)
+    # All_Tabs$project <- pf::decodeCustomFields(All_Tabs$project, All_Tabs$customfields)
     # All_Tabs$ticket <- pf::decodeCustomFields(All_Tabs$ticket, All_Tabs$customfields)
     # All_Tabs$worker <- pf::decodeCustomFields(All_Tabs$worker, All_Tabs$customfields)
-  })
+  # })
 
   # If ODBC connection fails, then loads from local R: drive
-  if (grepl("try-error", class(Tryclass), ignore.case = T)) {
+  # if (grepl("try-error", class(Tryclass), ignore.case = T)) {
     All_Tabs <- pf::getPFData()
-  }
+  # }
 } else {
   # print(paste0("the current directory is: ",getwd()))
   All_Tabs <- pf::getPFData(file = "pf_tabs.rds")

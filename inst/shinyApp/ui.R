@@ -32,36 +32,96 @@ ui <- shinydashboard::dashboardPage(
                                             inputId = "layout",
                                             label = "Layout",
                                             # See list of layouts: https://rstudio-pubs-static.s3.amazonaws.com/337696_c6b008e0766e46bebf1401bea67f7b10.html#network-layouts
-                                            choices = c("Layout on sphere",
-                                                        "Layout on grid",
-                                                        "Layout nicely",
-                                                        "Layout Reingold Tilford",
-                                                        "Layout components",
-                                                        "Layout as star",
-                                                        "Layout in circle",
-                                                        "Layout with fr",
-                                                        "Layout with kk",
-                                                        "Layout with mds",
-                                                        "Layout with lgl",
-                                                        "Layout with dh",
-                                                        "Layout with gem",
-                                                        "Layout with graphopt",
-                                                        "Layout with sugiyama",
+                                            choices = c("Layout on sphere", "Layout on grid", "Layout nicely",
+                                                        "Layout Reingold Tilford", "Layout components", "Layout as star",
+                                                        "Layout in circle", "Layout with fr", "Layout with kk",
+                                                        "Layout with mds", "Layout with lgl", "Layout with dh",
+                                                        "Layout with gem", "Layout with graphopt", "Layout with sugiyama",
                                                         "Layout randomly"),
                                             selected = Defaults$layout),
-                                            shinyWidgets::prettyRadioButtons(
-                                              inputId = "solver",
-                                              label = "Solver",
-                                              choices = c('barnesHut', 'repulsion', 'hierarchicalRepulsion', 'forceAtlas2Based'),
-                                              selected = "hierarchicalRepulsion",
-                                              inline = FALSE,
-                                              fill = TRUE,
-                                              animation = "smooth",
-                                              plain = TRUE),
-                                          # shinydashboard::box(id = "physics"),
+                                          shinyWidgets::prettyRadioButtons(
+                                            inputId = "solver",
+                                            label = "Solver",
+                                            choices = c("barnesHut", "forceAtlas2Based", "repulsion", "hierarchicalRepulsion"),
+                                            selected = "hierarchicalRepulsion",
+                                            inline = FALSE,
+                                            fill = TRUE,
+                                            animation = "smooth",
+                                            plain = TRUE),
+
+                                          ## Physics parameters
+                                          # See visPhysics: https://rdrr.io/cran/visNetwork/man/visPhysics.html
+                                          shiny::conditionalPanel('input.solver == "barnesHut" || input.solver == "forceAtlas2Based"',
+                                            shinyWidgets::sliderTextInput(
+                                            inputId = "theta",
+                                            label = "theta",
+                                            choices = seq(0.1,1,0.05),
+                                            selected = 0.5
+                                          ),
+                                          shinyWidgets::sliderTextInput(
+                                            inputId = "gravitationalConstant",
+                                            label = "gravitationalConstant",
+                                            choices = seq(-3000,0,50),
+                                            selected = -2000
+                                          )),
+                                          shiny::conditionalPanel('input.solver == "repulsion" || input.solver == "hierarchicalRepulsion"',
+                                          shinyWidgets::sliderTextInput(
+                                            inputId = "nodeDistance",
+                                            label = "nodeDistance",
+                                            choices = seq(0,500,5),
+                                            selected = 90
+                                          )),
+                                          shinyWidgets::sliderTextInput(
+                                            inputId = "centralGravity",
+                                            label = "centralGravity",
+                                            choices = seq(0,10,0.05),
+                                            selected = 0.3
+                                          ),
+                                          shinyWidgets::sliderTextInput(
+                                            inputId = "springLength",
+                                            label = "springLength",
+                                            choices = seq(0,500,5),
+                                            selected = 95
+                                          ),
+                                          shinyWidgets::sliderTextInput(
+                                            inputId = "springConstant",
+                                            label = "springConstant",
+                                            choices = seq(0,1.2,0.005),
+                                            selected = 0.04
+                                          ),
+                                          shinyWidgets::sliderTextInput(
+                                            inputId = "damping",
+                                            label = "damping",
+                                            choices = seq(0,1,0.01),
+                                            selected = 0.09
+                                          ),
+                                          shiny::conditionalPanel('input.solver != "repulsion""',
+                                          shinyWidgets::sliderTextInput(
+                                            inputId = "avoidOverlap",
+                                            label = "avoidOverlap",
+                                            choices = seq(0,1,0.01),
+                                            selected = 0
+                                          )),
+                                          shinyWidgets::sliderTextInput(
+                                            inputId = "timestep",
+                                            label = "timestep",
+                                            choices = seq(0.01,1,0.01),
+                                            selected = 0.5
+                                          ),
+                                          shinyWidgets::sliderTextInput(
+                                            inputId = "windX",
+                                            label = "windX",
+                                            choices = seq(-10,10,0.1),
+                                            selected = 0
+                                          ),
+                                          shinyWidgets::sliderTextInput(
+                                            inputId = "windY",
+                                            label = "windY",
+                                            choices = seq(-10,10,0.1),
+                                            selected = 0
+                                          ),
                                           shiny::actionButton("defaults", "Save as defaults", icon = shiny::icon("floppy-disk"))
                                           ))),
-
   ## Sidebar content
   shinydashboard::dashboardSidebar(width = 220,
       shinydashboard::sidebarUserPanel(name = "CTU Bern",image = "unibe_logo_mh.png"), # Logo
@@ -74,7 +134,7 @@ ui <- shinydashboard::dashboardPage(
                                shinydashboard::menuSubItem("Monitoring", tabName = "monitoring", icon = icon("search")),
                                shinydashboard::menuItem("Quality Management", tabName = "qualitymanagement", icon = icon("broom"))),
       shiny::radioButtons("projectlab", label = "Project labels", choices = c("IDs", "Names"),  inline=T),
-      shiny::selectInput("servicetype", label = "Service types", choices = c("\a", "Basic", "Full", "Light")),
+      shiny::selectInput("servicetype", label = "Service types", choices = c("\a", "Basic", "Full", "Light"), selected = "Basic"),
       shiny::checkboxGroupInput('projecttype', "Project types", c("External", "Consulting","Internal","FTE"), selected = "External"),
       shiny::selectInput("dlfsupport", label = "DLF support", choices = c("\a", "Yes", "No")),
       shiny::selectInput("dlfreached", label = "DLF reached", choices = c("\a", "Yes", "No")),

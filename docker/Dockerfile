@@ -23,14 +23,7 @@ RUN apt-get update -qq && apt-get -y --no-install-recommends install \
     gcc \
     unixodbc \
     odbcinst \
-    unixodbc-dev \
-    curl
-
-# Install Docker compose
-RUN curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
-
-# Change file permission
-RUN chmod +x /usr/local/bin/docker-compose
+    unixodbc-dev
 
 ## Update system libraries
 RUN apt-get update && \

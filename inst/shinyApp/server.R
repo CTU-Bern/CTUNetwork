@@ -5,6 +5,7 @@
 #' @importFrom scales rescale
 #' @importFrom foreach foreach
 #' @importFrom gridExtra grid.arrange
+#' @importFrom shinyWidgets updateSliderTextInput
 #' @import visNetwork
 #' @import dplyr
 #' @import grid
@@ -166,6 +167,7 @@ server <- function(input, output, session) { # Assemble inputs into outputs
     DataUp[,c("TimeSpent","TimeBudget")] <- lapply(DataUp[,c("TimeSpent","TimeBudget")], ConvertTime)
 
     # Outputs
+    # source("C:/Users/cw22l219/Documents/GitHub/CTUNetwork/R/NetworkPlot.R")
     return(list(DataPlot = DataPlot, DataUp = DataUp, Nodes = Nodes, Edges = Edges))
   })
   # ----
@@ -177,13 +179,64 @@ server <- function(input, output, session) { # Assemble inputs into outputs
                                  stringr::str_replace_all(input$layout, " ","."),
                                  stringr::str_replace_all(input$layout, " ","_"))),
          physics = ifelse(input$physics == "Yes", T, F),
-         solver = input$solver)
+         solver = input$solver,
+         solver = input$solver,
+         timestep = input$timestep,
+         barnesHut = list(theta = input$theta,
+                          gravitationalConstant = input$gravitationalConstant,
+                          centralGravity = input$centralGravity,
+                          springLength = input$springLength,
+                          springConstant = input$springConstant,
+                          damping = input$damping,
+                          avoidOverlap = input$avoidOverlap),
+         forceAtlas2Based = list(theta = input$theta,
+                                 gravitationalConstant = input$gravitationalConstant,
+                                 centralGravity = input$centralGravity,
+                                 springLength = input$springLength,
+                                 springConstant = input$springConstant,
+                                 damping = input$damping,
+                                 avoidOverlap = input$avoidOverlap),
+         repulsion = list(nodeDistance = input$nodeDistance,
+                          centralGravity = input$centralGravity,
+                          springLength = input$springLength,
+                          springConstant = input$springConstant,
+                          damping = input$damping),
+         hierarchicalRepulsion = list(nodeDistance = input$nodeDistance,
+                                      centralGravity = input$centralGravity,
+                                      springLength = input$springLength,
+                                      springConstant = input$springConstant,
+                                      damping = input$damping,
+                                      avoidOverlap = input$avoidOverlap),
+         wind = list(X = input$windX, Y = input$windY))
   )
 
   # 1. Network plot
-  output$mynetworkid <- visNetwork::renderVisNetwork(
-    NetworkPlot(AllData()$Nodes, AllData()$Edges, params = GraphParams())
-  )
+  output$mynetworkid <- visNetwork::renderVisNetwork( {
+    NetworkPlot(AllData()$Nodes, AllData()$Edges) # , params = GraphParams()
+  })
+
+  # Update the graph if data has changed
+  observeEvent(input$tab, {
+    visNetwork::visNetworkProxy("mynetworkid") %>%
+      visNetwork::visUpdateNodes(AllData()$Nodes) %>%
+      visNetwork::visUpdateEdges(AllData()$Edges)
+  })
+
+  # Update the graph if solver parameter is changed
+  observeEvent(input$solver, {
+    visNetwork::visNetworkProxy("mynetworkid") %>%
+      visNetwork::visPhysics(solver = GraphParams()$solver)
+      # visNetwork::visSetOptions(options = list(physics = Params))
+  })
+
+  # Update the graph if solver parameter is changed
+  observeEvent(input$nodeDistance, {
+    visNetwork::visNetworkProxy("mynetworkid") %>%
+    visNetwork::visSetOptions(options = list(
+      physics = list(
+        hierarchicalRepulsion = list(
+          nodeDistance = GraphParams()$hierarchicalRepulsion$nodeDistance))))
+  })
 
   # 2. Legend
   output$mylegend <- shiny::renderPlot({
@@ -335,11 +388,50 @@ server <- function(input, output, session) { # Assemble inputs into outputs
     shinyjs::reset()
   })
 
+  # Physics default parameters
+  # See visPhysics: https://rdrr.io/cran/visNetwork/man/visPhysics.html
+  PhysicsDef <- data.frame(
+    theta = c(0.5, 0.5, NA, NA),
+    gravitationalConstant = c(-2000, -50, NA, NA),
+    nodeDistance = c(NA, NA, 100, 120),
+    centralGravity = c(0.3, 0.1, 0.2, 0.0),
+    springLength = c(95, 100, 200, 100),
+    springConstant = c(0.04, 0.08, 0.05, 0.01),
+    damping = c(0.09, 0.04, 0.09, 0.09),
+    avoidOverlap = c(0, 0, NA, 0)
+  )
+  # VisPhysics solver list
+  SolverList <- c("barnesHut", "forceAtlas2Based", "repulsion", "hierarchicalRepulsion")
+
+  # Update defaults based on selected solver
+  observeEvent(input$solver,{
+    Pos <- which(SolverList == input$solver)
+    shinyWidgets::updateSliderTextInput(session, inputId = "theta", selected = PhysicsDef$theta[Pos])
+    shinyWidgets::updateSliderTextInput(session, inputId = "gravitationalConstant", selected = PhysicsDef$gravitationalConstant[Pos])
+    shinyWidgets::updateSliderTextInput(session, inputId = "nodeDistance", selected = PhysicsDef$nodeDistance[Pos])
+    shinyWidgets::updateSliderTextInput(session, inputId = "centralGravity", selected = PhysicsDef$centralGravity[Pos])
+    shinyWidgets::updateSliderTextInput(session, inputId = "springLength", selected = PhysicsDef$springLength[Pos])
+    shinyWidgets::updateSliderTextInput(session, inputId = "springConstant", selected = PhysicsDef$springConstant[Pos])
+    shinyWidgets::updateSliderTextInput(session, inputId = "damping", selected = PhysicsDef$damping[Pos])
+    shinyWidgets::updateSliderTextInput(session, inputId = "avoidOverlap", selected = PhysicsDef$avoidOverlap[Pos])
+  })
+
   # Saving parameters as defaults
   shiny::observeEvent(input$defaults, {
     Defaults <- list(physics = input$physics,
                      layout = input$layout,
-                     solver = input$solver)
+                     solver = input$solver,
+                     theta = input$theta,
+                     gravitationalConstant = input$gravitationalConstant,
+                     nodeDistance = input$nodeDistance,
+                     centralGravity = input$centralGravity,
+                     springLength = input$springLength,
+                     springConstant = input$springConstant,
+                     damping = input$damping,
+                     avoidOverlap = input$avoidOverlap,
+                     timestep = input$timestep,
+                     windX = input$windX,
+                     windY = input$windY)
     saveRDS(Defaults, "www/Defaults.rds")
 
     # Shiny alert to confirm defaults are saved
