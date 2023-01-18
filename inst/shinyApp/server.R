@@ -167,7 +167,6 @@ server <- function(input, output, session) { # Assemble inputs into outputs
     DataUp[,c("TimeSpent","TimeBudget")] <- lapply(DataUp[,c("TimeSpent","TimeBudget")], ConvertTime)
 
     # Outputs
-    # source("C:/Users/cw22l219/Documents/GitHub/CTUNetwork/R/NetworkPlot.R")
     return(list(DataPlot = DataPlot, DataUp = DataUp, Nodes = Nodes, Edges = Edges))
   })
   # ----

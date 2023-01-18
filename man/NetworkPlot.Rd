@@ -10,7 +10,10 @@ http://datastorm-open.github.io/visNetwork/shiny.html}
 NetworkPlot(
   nodes,
   edges,
-  params = list(layout = "layout_on_sphere", physics = T)
+  params = list(layout = "layout_on_sphere", physics = T, solver =
+    "hierarchicalRepulsion", timestep = 0.5, windX = 0, windY = 0, hierarchicalRepulsion
+    = list(nodeDistance = 90, centralGravity = 0, springLength = 850, springConstant =
+    0.01, damping = 0.09, avoidOverlap = 0))
 )
 }
 \arguments{
@@ -18,7 +21,7 @@ NetworkPlot(
 
 \item{edges}{dataframe containing edges data, see visNetwork()}
 
-\item{params}{list of parameters to control graph behaviour, see visNetwork()}
+\item{params}{list of parameters to control graph physics behaviour, see visIgraphLayout() and visPhysics()}
 }
 \description{
 Network plot function - Build the network
