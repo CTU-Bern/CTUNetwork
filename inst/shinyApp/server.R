@@ -409,13 +409,13 @@ server <- function(input, output, session) { # Assemble inputs into outputs
   # C) Physics (Y/N)
   observeEvent(input$physics, {
     visNetwork::visNetworkProxy("mynetworkid") %>%
-      visNetwork::visSetOptions(options = list(layout = list(physics = GraphParams()$physics)))
+      visNetwork::visSetOptions(options = list(igraphlayout = list(physics = GraphParams()$physics)))
   })
 
   # D) Layout
   observeEvent(input$layout, {
     visNetwork::visNetworkProxy("mynetworkid") %>%
-      visNetwork::visSetOptions(options = list(layout = list(layout = GraphParams()$layout)))
+      visNetwork::visSetOptions(options = list(igraphlayout = list(layout = GraphParams()$layout)))
   })
 
   # 1) theta
