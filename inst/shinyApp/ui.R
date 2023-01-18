@@ -134,7 +134,7 @@ ui <- shinydashboard::dashboardPage(
                                shinydashboard::menuSubItem("Monitoring", tabName = "monitoring", icon = icon("search")),
                                shinydashboard::menuItem("Quality Management", tabName = "qualitymanagement", icon = icon("broom"))),
       shiny::radioButtons("projectlab", label = "Project labels", choices = c("IDs", "Names"),  inline=T),
-      shiny::selectInput("servicetype", label = "Service types", choices = c("\a", "Basic", "Full", "Light"), selected = "Basic"),
+      shiny::selectInput("servicetype", label = "Service types", choices = c("\a", "Basic", "Full", "Light")),
       shiny::checkboxGroupInput('projecttype', "Project types", c("External", "Consulting","Internal","FTE"), selected = "External"),
       shiny::selectInput("dlfsupport", label = "DLF support", choices = c("\a", "Yes", "No")),
       shiny::selectInput("dlfreached", label = "DLF reached", choices = c("\a", "Yes", "No")),

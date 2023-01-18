@@ -211,30 +211,7 @@ server <- function(input, output, session) { # Assemble inputs into outputs
 
   # 1. Network plot
   output$mynetworkid <- visNetwork::renderVisNetwork( {
-    NetworkPlot(AllData()$Nodes, AllData()$Edges) # , params = GraphParams()
-  })
-
-  # Update the graph if data has changed
-  observeEvent(input$tab, {
-    visNetwork::visNetworkProxy("mynetworkid") %>%
-      visNetwork::visUpdateNodes(AllData()$Nodes) %>%
-      visNetwork::visUpdateEdges(AllData()$Edges)
-  })
-
-  # Update the graph if solver parameter is changed
-  observeEvent(input$solver, {
-    visNetwork::visNetworkProxy("mynetworkid") %>%
-      visNetwork::visPhysics(solver = GraphParams()$solver)
-      # visNetwork::visSetOptions(options = list(physics = Params))
-  })
-
-  # Update the graph if solver parameter is changed
-  observeEvent(input$nodeDistance, {
-    visNetwork::visNetworkProxy("mynetworkid") %>%
-    visNetwork::visSetOptions(options = list(
-      physics = list(
-        hierarchicalRepulsion = list(
-          nodeDistance = GraphParams()$hierarchicalRepulsion$nodeDistance))))
+    NetworkPlot(AllData()$Nodes, AllData()$Edges)
   })
 
   # 2. Legend
@@ -413,6 +390,114 @@ server <- function(input, output, session) { # Assemble inputs into outputs
     shinyWidgets::updateSliderTextInput(session, inputId = "springConstant", selected = PhysicsDef$springConstant[Pos])
     shinyWidgets::updateSliderTextInput(session, inputId = "damping", selected = PhysicsDef$damping[Pos])
     shinyWidgets::updateSliderTextInput(session, inputId = "avoidOverlap", selected = PhysicsDef$avoidOverlap[Pos])
+  })
+
+  # FUNCTIONS TO UPDATE VISNETWORK GRAPH BASED ON UI (similar to VisConfigure())
+  # A) Graph Data
+  observeEvent(input$tab, {
+    visNetwork::visNetworkProxy("mynetworkid") %>%
+      visNetwork::visUpdateNodes(AllData()$Nodes) %>%
+      visNetwork::visUpdateEdges(AllData()$Edges)
+  })
+
+  # B) Graph solver
+  observeEvent(input$solver, {
+    visNetwork::visNetworkProxy("mynetworkid") %>%
+      visNetwork::visPhysics(solver = GraphParams()$solver)
+  })
+
+  # C) Physics (Y/N)
+  observeEvent(input$physics, {
+    visNetwork::visNetworkProxy("mynetworkid") %>%
+      visNetwork::visSetOptions(options = list(layout = list(physics = GraphParams()$physics)))
+  })
+
+  # D) Layout
+  observeEvent(input$layout, {
+    visNetwork::visNetworkProxy("mynetworkid") %>%
+      visNetwork::visSetOptions(options = list(layout = list(layout = GraphParams()$layout)))
+  })
+
+  # 1) theta
+  observeEvent(input$theta, {
+    Options = list(physics = NULL)
+    Options$physics[[input$solver]] = list(theta = GraphParams()[[input$solver]]$theta)
+    visNetwork::visNetworkProxy("mynetworkid") %>%
+      visNetwork::visSetOptions(options = Options)
+  })
+
+  # 2) gravitationalConstant
+  observeEvent(input$gravitationalConstant, {
+    Options = list(physics = NULL)
+    Options$physics[[input$solver]] = list(gravitationalConstant = GraphParams()[[input$solver]]$gravitationalConstant)
+    visNetwork::visNetworkProxy("mynetworkid") %>%
+      visNetwork::visSetOptions(options = Options)
+  })
+
+  # 3) nodeDistance
+  observeEvent(input$nodeDistance, {
+    Options = list(physics = NULL)
+    Options$physics[[input$solver]] = list(nodeDistance = GraphParams()[[input$solver]]$nodeDistance)
+    visNetwork::visNetworkProxy("mynetworkid") %>%
+      visNetwork::visSetOptions(options = Options)
+  })
+
+  # 4) centralGravity
+  observeEvent(input$centralGravity, {
+    Options = list(physics = NULL)
+    Options$physics[[input$solver]] = list(centralGravity = GraphParams()[[input$solver]]$centralGravity)
+    visNetwork::visNetworkProxy("mynetworkid") %>%
+      visNetwork::visSetOptions(options = Options)
+  })
+
+  # 5) springLength
+  observeEvent(input$springLength, {
+    Options = list(physics = NULL)
+    Options$physics[[input$solver]] = list(springLength = GraphParams()[[input$solver]]$springLength)
+    visNetwork::visNetworkProxy("mynetworkid") %>%
+      visNetwork::visSetOptions(options = Options)
+  })
+
+  # 6) springConstant
+  observeEvent(input$springConstant, {
+    Options = list(physics = NULL)
+    Options$physics[[input$solver]] = list(springConstant = GraphParams()[[input$solver]]$springConstant)
+    visNetwork::visNetworkProxy("mynetworkid") %>%
+      visNetwork::visSetOptions(options = Options)
+  })
+
+  # 7) damping
+  observeEvent(input$damping, {
+    Options = list(physics = NULL)
+    Options$physics[[input$solver]] = list(damping = GraphParams()[[input$solver]]$damping)
+    visNetwork::visNetworkProxy("mynetworkid") %>%
+      visNetwork::visSetOptions(options = Options)
+  })
+
+  # 8) avoidOverlap
+  observeEvent(input$avoidOverlap, {
+    Options = list(physics = NULL)
+    Options$physics[[input$solver]] = list(avoidOverlap = GraphParams()[[input$solver]]$avoidOverlap)
+    visNetwork::visNetworkProxy("mynetworkid") %>%
+      visNetwork::visSetOptions(options = Options)
+  })
+
+  # 9) timestep
+  observeEvent(input$timestep, {
+    visNetwork::visNetworkProxy("mynetworkid") %>%
+      visNetwork::visSetOptions(options = list(timestep = list(windX = GraphParams()$timestep)))
+  })
+
+  # 10) windX
+  observeEvent(input$windX, {
+    visNetwork::visNetworkProxy("mynetworkid") %>%
+      visNetwork::visSetOptions(options = list(physics = list(windX = GraphParams()$windX)))
+  })
+
+  # 11) windX
+  observeEvent(input$windY, {
+    visNetwork::visNetworkProxy("mynetworkid") %>%
+      visNetwork::visSetOptions(options = list(windY = list(windX = GraphParams()$windY)))
   })
 
   # Saving parameters as defaults
