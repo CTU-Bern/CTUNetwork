@@ -7,14 +7,7 @@ Tutorials:
 https://www.statworx.com/en/content-hub/blog/interactive-network-visualization-with-r
 http://datastorm-open.github.io/visNetwork/shiny.html}
 \usage{
-NetworkPlot(
-  nodes,
-  edges,
-  params = list(layout = "layout_on_sphere", physics = T, solver =
-    "hierarchicalRepulsion", timestep = 0.5, windX = 0, windY = 0, hierarchicalRepulsion
-    = list(nodeDistance = 90, centralGravity = 0, springLength = 850, springConstant =
-    0.01, damping = 0.09, avoidOverlap = 0))
-)
+NetworkPlot(nodes, edges, layout = "layout_on_sphere", physics = T)
 }
 \arguments{
 \item{nodes}{dataframe containing nodes data, see visNetwork()}

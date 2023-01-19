@@ -2,6 +2,7 @@
 #' @importFrom shinyjs useShinyjs
 #' @importFrom DT dataTableOutput
 #' @importFrom visNetwork visNetworkOutput
+#' @importFrom shinyBS bsTooltip
 #' @import shiny
 #' @import shinyWidgets
 #' @import shinydashboard
@@ -43,7 +44,7 @@ ui <- shinydashboard::dashboardPage(
                                             inputId = "solver",
                                             label = "Solver",
                                             choices = c("barnesHut", "forceAtlas2Based", "repulsion", "hierarchicalRepulsion"),
-                                            selected = "hierarchicalRepulsion",
+                                            selected = Defaults$solver,
                                             inline = FALSE,
                                             fill = TRUE,
                                             animation = "smooth",
@@ -52,74 +53,37 @@ ui <- shinydashboard::dashboardPage(
                                           ## Physics parameters
                                           # See visPhysics: https://rdrr.io/cran/visNetwork/man/visPhysics.html
                                           shiny::conditionalPanel('input.solver == "barnesHut" || input.solver == "forceAtlas2Based"',
-                                            shinyWidgets::sliderTextInput(
-                                            inputId = "theta",
-                                            label = "theta",
-                                            choices = seq(0.1,1,0.05),
-                                            selected = 0.5
-                                          ),
-                                          shinyWidgets::sliderTextInput(
-                                            inputId = "gravitationalConstant",
-                                            label = "gravitationalConstant",
-                                            choices = seq(-3000,0,50),
-                                            selected = -2000
-                                          )),
+                                          shiny::uiOutput("theta.ui"),
+                                          shiny::uiOutput("gravitationalConstant.ui")),
                                           shiny::conditionalPanel('input.solver == "repulsion" || input.solver == "hierarchicalRepulsion"',
-                                          shinyWidgets::sliderTextInput(
-                                            inputId = "nodeDistance",
-                                            label = "nodeDistance",
-                                            choices = seq(0,500,5),
-                                            selected = 90
-                                          )),
-                                          shinyWidgets::sliderTextInput(
-                                            inputId = "centralGravity",
-                                            label = "centralGravity",
-                                            choices = seq(0,10,0.05),
-                                            selected = 0.3
-                                          ),
-                                          shinyWidgets::sliderTextInput(
-                                            inputId = "springLength",
-                                            label = "springLength",
-                                            choices = seq(0,500,5),
-                                            selected = 95
-                                          ),
-                                          shinyWidgets::sliderTextInput(
-                                            inputId = "springConstant",
-                                            label = "springConstant",
-                                            choices = seq(0,1.2,0.005),
-                                            selected = 0.04
-                                          ),
-                                          shinyWidgets::sliderTextInput(
-                                            inputId = "damping",
-                                            label = "damping",
-                                            choices = seq(0,1,0.01),
-                                            selected = 0.09
-                                          ),
+                                          shiny::uiOutput("nodeDistance.ui")),
+                                          shiny::uiOutput("centralGravity.ui"),
+                                          shiny::uiOutput("springLength.ui"),
+                                          shiny::uiOutput("springConstant.ui"),
+                                          shiny::uiOutput("damping.ui"),
                                           shiny::conditionalPanel('input.solver != "repulsion""',
-                                          shinyWidgets::sliderTextInput(
-                                            inputId = "avoidOverlap",
-                                            label = "avoidOverlap",
-                                            choices = seq(0,1,0.01),
-                                            selected = 0
-                                          )),
+                                          shiny::uiOutput("avoidOverlap.ui")),
                                           shinyWidgets::sliderTextInput(
                                             inputId = "timestep",
                                             label = "timestep",
                                             choices = seq(0.01,1,0.01),
-                                            selected = 0.5
-                                          ),
+                                            selected = Defaults$timestep),
+                                          shinyBS::bsTooltip("timestep", "The physics simulation is discrete. This means we take a step in time, calculate the forces, move the nodes and take another step. If you increase this number the steps will be too large and the network can get unstable. If you see a lot of jittery movement in the network, you may want to reduce this value a little.",
+                                                            "left", options = list(container = "body")),
                                           shinyWidgets::sliderTextInput(
                                             inputId = "windX",
                                             label = "windX",
                                             choices = seq(-10,10,0.1),
-                                            selected = 0
-                                          ),
+                                            selected = Defaults$wind$X),
+                                          shinyBS::bsTooltip("windX", "A force that pushes all non-fixed nodes in the given direction. Requires all nodes are connected to nodes which are fixed, otherwise non-attached nodes will keep moving indefinitely. The amount of force to be applied pushing non-fixed nodes to the right (positive value) or to the left (negative value)",
+                                                            "left", options = list(container = "body")),
                                           shinyWidgets::sliderTextInput(
                                             inputId = "windY",
                                             label = "windY",
                                             choices = seq(-10,10,0.1),
-                                            selected = 0
-                                          ),
+                                            selected = Defaults$wind$Y),
+                                          shinyBS::bsTooltip("windY", "A force that pushes all non-fixed nodes in the given direction. Requires all nodes are connected to nodes which are fixed, otherwise non-attached nodes will keep moving indefinitely. The amount of force to be applied pushing non-fixed nodes downwards (positive value) or upwards (negative value)",
+                                                            "left", options = list(container = "body")),
                                           shiny::actionButton("defaults", "Save as defaults", icon = shiny::icon("floppy-disk"))
                                           ))),
   ## Sidebar content
@@ -168,8 +132,7 @@ ui <- shinydashboard::dashboardPage(
                collapsible = TRUE,
                column(10, visNetwork::visNetworkOutput("mynetworkid", height = "1200")),
                column(2, style = "height:150px; ",
-                      shiny::plotOutput("mylegend", height = "400"))
-  )),
+                      shiny::plotOutput("mylegend", height = "400")))),
 
   # Grouping all in a tabBox instead of individual boxes
   shiny::fluidRow(

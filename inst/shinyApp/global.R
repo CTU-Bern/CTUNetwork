@@ -65,10 +65,54 @@ names(AllRows) <- colnames(Data)[-dim(Data)[2]]
 SelectRows <- AllRows[c(1,3,4,8,18,20,21,22,23,24)]
 
 # Load default parameters
-if (file.exists("www/Defaults.rds")) {
-  LibPath <- .libPaths()[1] # There may be more than one
+LibPath <- .libPaths()[1] # There may be more than one
+if (file.exists(paste0(LibPath,"/CTUNetwork/shinyApp/www/Defaults.rds"))) {
   Defaults <- readRDS(paste0(LibPath,"/CTUNetwork/shinyApp/www/Defaults.rds"))
 } else {
   Defaults <- list(physics = "Yes",
                    layout = "Layout on sphere",
-                   solver = "hierarchicalRepulsion")}
+                   solver = "hierarchicalRepulsion",
+                   timestep = 0.5,
+                   wind = list(X = 0,
+                               Y = 0),
+                   hierarchicalRepulsion = list(nodeDistance = 90,
+                                                centralGravity = 0.0,
+                                                springLength = 850,
+                                                springConstant = 0.01,
+                                                damping = 0.09,
+                                                avoidOverlap = 0))
+}
+
+# visPhysics ranges are different based on solver type
+SolverRanges <- list(
+  barnesHut = list(
+    theta = seq(0.1, 1, 0.05),
+    gravitationalConstant = seq(-3000, 0, 50),
+    centralGravity = seq(0, 10, 0.05),
+    springLength = seq(0, 500, 5),
+    springConstant = seq(0, 1.2, 0.005),
+    damping = seq(0, 1, 0.01),
+    avoidOverlap = seq(0, 1, 0.01)),
+  forceAtlas2Based = list(
+    theta = seq(0.1, 1, 0.05),
+    gravitationalConstant = seq(-500, 0, 1),
+    centralGravity = seq(0, 1, 0.005),
+    springLength = seq(0, 500, 5),
+    springConstant = seq(0, 1.2, 0.005),
+    damping = seq(0, 1, 0.01),
+    avoidOverlap = seq(0, 1, 0.01)),
+  repulsion = list(
+    nodeDistance = seq(0, 500, 5),
+    centralGravity = seq(0, 10, 0.05),
+    springLength = seq(0, 500, 5),
+    springConstant = seq(0, 1.2, 0.005),
+    damping = seq(0, 1, 0.01)),
+  hierarchicalRepulsion = list(
+    nodeDistance = seq(0, 500, 5),
+    centralGravity = seq(0, 10, 0.05),
+    springLength = seq(0, 1020, 5),
+    springConstant = seq(0, 1.2, 0.005),
+    damping = seq(0, 1, 0.01),
+    avoidOverlap = seq(0, 1, 0.01))
+)
+

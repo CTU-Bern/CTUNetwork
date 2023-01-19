@@ -13,18 +13,20 @@
 #' @examples
 #' All_Tabs <- getPFData()
 
-NetworkPlot <- function(nodes, edges, params = list(layout = "layout_on_sphere",
-                                                    physics = T,
-                                                    solver = "hierarchicalRepulsion",
-                                                    timestep = 0.5,
-                                                    windX = 0,
-                                                    windY = 0,
-                                                    hierarchicalRepulsion = list(nodeDistance = 90,
-                                                                                 centralGravity = 0.0,
-                                                                                 springLength = 850,
-                                                                                 springConstant = 0.01,
-                                                                                 damping = 0.09,
-                                                                                 avoidOverlap = 0))){
+NetworkPlot <- function(nodes, edges, layout = "layout_on_sphere", physics = T){
+
+  # params = list(layout = "layout_on_sphere",
+  #               physics = T,
+  #               solver = "hierarchicalRepulsion",
+  #               timestep = 0.5,
+  #               windX = 0,
+  #               windY = 0,
+  #               hierarchicalRepulsion = list(nodeDistance = 90,
+  #                                            centralGravity = 0.0,
+  #                                            springLength = 850,
+  #                                            springConstant = 0.01,
+  #                                            damping = 0.09,
+  #                                            avoidOverlap = 0)
 
   # Create the initial plot
   Plot <- visNetwork::visNetwork(nodes, edges,
@@ -32,73 +34,64 @@ NetworkPlot <- function(nodes, edges, params = list(layout = "layout_on_sphere",
                 submain = "Nodes width = Amount of time booked for each individual worker - Edges width = Amount of time booked overall (all workers combined)")
 
   # Select the layout (from UI)
-  if (params$layout == "layout.reingold.tilford"){
+  if (layout == "layout.reingold.tilford"){
     Plot <- Plot %>%
-    visNetwork::visIgraphLayout(layout = "layout.reingold.tilford", physics = params$physics, circular = T, randomSeed = 1234, smooth = F)
+    visNetwork::visIgraphLayout(layout = "layout.reingold.tilford", physics = physics, circular = T,  randomSeed = 1234, smooth = F)
   } else {
     Plot <- Plot %>%
-    visNetwork::visIgraphLayout(layout = params$layout, physics = params$physics, randomSeed = 1234, smooth = F)}
+    visNetwork::visIgraphLayout(layout = layout, physics = physics, randomSeed = 1234, smooth = F)}
 
-  # Add the options
-  if (params$solver == "barnesHut"){
-    Plot <- Plot %>%
-    visNetwork::visPhysics(solver = "barnesHut",
-                           timestep = params$timestep,
-                           wind = list(X = params$windX, Y = params$windY),
-                           stabilization = "onlyDynamicEdges",
-                           barnesHut = list(theta = params$barnesHut$theta,
-                                            gravitationalConstant = params$barnesHut$gravitationalConstant,
-                                            centralGravity = params$barnesHut$centralGravity,
-                                            springLength = params$barnesHut$springLength,
-                                            springConstant = params$barnesHut$springConstant,
-                                            damping = params$barnesHut$damping,
-                                            avoidOverlap = params$barnesHut$avoidOverlap))
-
-  } else if (params$solver == "forceAtlas2Based") {
-
-    Plot <- Plot %>%
-      visNetwork::visPhysics(solver = "forceAtlas2Based",
-                             timestep = params$timestep,
-                             wind = list(X = params$windX, Y = params$windY),
-                             stabilization = "onlyDynamicEdges",
-                             barnesHut = list(theta = params$forceAtlas2Based$theta,
-                                              gravitationalConstant = params$forceAtlas2Based$gravitationalConstant,
-                                              centralGravity = params$forceAtlas2Based$centralGravity,
-                                              springLength = params$forceAtlas2Based$springLength,
-                                              springConstant = params$forceAtlas2Based$springConstant,
-                                              damping = params$forceAtlas2Based$damping,
-                                              avoidOverlap = params$forceAtlas2Based$avoidOverlap))
-
-  } else if (params$solver == "repulsion") {
-    Plot <- Plot %>%
-      visNetwork::visPhysics(solver = "repulsion",
-                             timestep = params$timestep,
-                             wind = list(X = params$windX, Y = params$windY),
-                             stabilization = "onlyDynamicEdges",
-                             barnesHut = list(nodeDistance = params$repulsion$nodeDistance,
-                                              centralGravity = params$repulsion$centralGravity,
-                                              springLength = params$repulsion$springLength,
-                                              springConstant = params$repulsion$springConstant,
-                                              damping = params$repulsion$damping))
-
-  } else if (params$solver == "hierarchicalRepulsion") {
-    Plot <- Plot %>%
-      visNetwork::visPhysics(solver = "hierarchicalRepulsion",
-                             timestep = params$timestep,
-                             wind = list(X = params$windX, Y = params$windY),
-                             stabilization = "onlyDynamicEdges",
-                             barnesHut = list(nodeDistance = params$hierarchicalRepulsion$nodeDistance,
-                                              centralGravity = params$hierarchicalRepulsion$centralGravity,
-                                              springLength = params$hierarchicalRepulsion$springLength,
-                                              springConstant = params$hierarchicalRepulsion$springConstant,
-                                              damping = params$hierarchicalRepulsion$damping,
-                                              avoidOverlap = params$hierarchicalRepulsion$avoidOverlap))
-  }
+  # # Add the options
+  # if (params$solver == "barnesHut" | params$solver == "forceAtlas2Based"){
+  #   Plot <- Plot %>%
+  #   visNetwork::visPhysics(enabled = params$physics,
+  #                          solver = params$solver,
+  #                          timestep = params$timestep,
+  #                          wind = list(X = params$windX, Y = params$windY),
+  #                          stabilization = "onlyDynamicEdges",
+  #                          barnesHut = list(theta = params[[params$solver]]$theta,
+  #                                           gravitationalConstant = params[[params$solver]]$gravitationalConstant,
+  #                                           centralGravity = params[[params$solver]]$centralGravity,
+  #                                           springLength = params[[params$solver]]$springLength,
+  #                                           springConstant = params[[params$solver]]$springConstant,
+  #                                           damping = params[[params$solver]]$damping,
+  #                                           avoidOverlap = params[[params$solver]]$avoidOverlap))
+  #
+  # } else if (params$solver == "repulsion") {
+  #   Plot <- Plot %>%
+  #     visNetwork::visPhysics(enabled = params$physics,
+  #                            solver = "repulsion",
+  #                            timestep = params$timestep,
+  #                            wind = list(X = params$windX, Y = params$windY),
+  #                            stabilization = "onlyDynamicEdges",
+  #                            barnesHut = list(nodeDistance = params$repulsion$nodeDistance,
+  #                                             centralGravity = params$repulsion$centralGravity,
+  #                                             springLength = params$repulsion$springLength,
+  #                                             springConstant = params$repulsion$springConstant,
+  #                                             damping = params$repulsion$damping))
+#
+#   } else if (params$solver == "hierarchicalRepulsion") {
+#     Plot <- Plot %>%
+#       visNetwork::visPhysics(enabled = params$physics,
+#                              solver = "hierarchicalRepulsion",
+#                              timestep = params$timestep,
+#                              wind = list(X = params$windX, Y = params$windY),
+#                              stabilization = "onlyDynamicEdges",
+#                              barnesHut = list(nodeDistance = params$hierarchicalRepulsion$nodeDistance,
+#                                               centralGravity = params$hierarchicalRepulsion$centralGravity,
+#                                               springLength = params$hierarchicalRepulsion$springLength,
+#                                               springConstant = params$hierarchicalRepulsion$springConstant,
+#                                               damping = params$hierarchicalRepulsion$damping,
+#                                               avoidOverlap = params$hierarchicalRepulsion$avoidOverlap))
+#   }
 
   # Add options and data
   Plot %>%
-  visNetwork::visOptions(highlightNearest = T, nodesIdSelection = list(enabled = TRUE, main = "Select Worker/Project"),
-                         selectedBy = list(variable="group", main = "Select State")) %>% #, multiple=T
+    visNetwork::visPhysics(solver = "hierarchicalRepulsion",
+                           hierarchicalRepulsion = list(nodeDistance = 90,
+                                                        springLength = 850)) %>%
+    visNetwork::visOptions(highlightNearest = T, nodesIdSelection = list(enabled = TRUE, main = "Select Worker/Project"),
+                           selectedBy = list(variable="group", main = "Select State")) %>% #, multiple=T
     visNetwork::visNodes(shapeProperties = list(interpolation = F)) %>%
     visNetwork::visEdges(smooth = F, color=list(color = "#848484", highlight = "#000000")) %>%
 
@@ -111,5 +104,4 @@ NetworkPlot <- function(nodes, edges, params = list(layout = "layout_on_sphere",
                           deselectNode = "function(){
                     closeBox('Bargraphs');
                     }")
-
 }

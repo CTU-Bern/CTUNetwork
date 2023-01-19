@@ -41,6 +41,9 @@ RUN cmake --build . --config RelWithDebInfo
 ## Installing MariaDB Connector/ODBC
 RUN sudo make install
 
+## test if correctly installed
+RUN sudo odbcinst -q
+
 ## Navigate to the previous directory
 WORKDIR /
 

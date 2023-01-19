@@ -6,6 +6,7 @@
 #' @importFrom foreach foreach
 #' @importFrom gridExtra grid.arrange
 #' @importFrom shinyWidgets updateSliderTextInput
+#' @importFrom shinyBS tipify
 #' @import visNetwork
 #' @import dplyr
 #' @import grid
@@ -81,19 +82,14 @@ server <- function(input, output, session) { # Assemble inputs into outputs
       # if (input$cdms!="\a") {FiltIdx <- FiltIdx & as.logical(mapply(grepl,input$cdms,DataUp$CDMS, ignore.case=T))}
       if (input$cdms!="\a") {FiltIdx <- FiltIdx & grepl(input$cdms,DataUp$CDMS, ignore.case=T)}
 
-      # Filter for DLF support
+      # Filter for DLF support included
       if (input$dlfsupport!="\a") {
-        DataUp <- DataUp[grepl(ifelse(input$dlfsupport=="Yes", T, F),DataUp$DLFSupport),]
-      }
-
-      # Filter for DLF support
-      if (input$dlfreached!="\a") {
-        DataUp <- DataUp[grepl(ifelse(input$dlfreached=="Yes", T, F),DataUp$DLFReached),]
+        FiltIdx <- FiltIdx & grepl(ifelse(input$dlfsupport=="Yes", T, F),DataUp$DLFSupport)
       }
 
       # Apply filtering
       DataUp <- DataUp[FiltIdx,]
-
+      DataUp <- droplevels(DataUp) # remove unused factor levels
     }
 
     # Filter for productive dates
@@ -110,6 +106,13 @@ server <- function(input, output, session) { # Assemble inputs into outputs
 
     # Computing different calculations based on filtering parameters
     DataUp <- Calculations(DataUp)
+
+    # Filter for DLF support reached
+    # This needs to be placed after the time bookings filtering and re-caculation of $DLFReached (in Calculations())
+    if (input$dlfreached!="\a") {
+      Idx <- DataUp$ProjectIDs[which(grepl(ifelse(input$dlfreached=="Yes", T, F),DataUp$DLFReached))]
+      TEMP <- DataUp[which(DataUp$ProjectIDs %in% Idx),]
+    }
 
     ## Preparing data for network
     # Removing the lines corresponding to the project level (the aim is to separate for each division)
@@ -174,11 +177,8 @@ server <- function(input, output, session) { # Assemble inputs into outputs
 
   # Retrieve graph parameters from UI
   GraphParams <- shiny::reactive(
-    list(layout = tolower(ifelse(input$layout == "Layout Reingold Tilford",
-                                 stringr::str_replace_all(input$layout, " ","."),
-                                 stringr::str_replace_all(input$layout, " ","_"))),
-         physics = ifelse(input$physics == "Yes", T, F),
-         solver = input$solver,
+    list(layout = input$layout,
+         physics = input$physics,
          solver = input$solver,
          timestep = input$timestep,
          barnesHut = list(theta = input$theta,
@@ -211,7 +211,10 @@ server <- function(input, output, session) { # Assemble inputs into outputs
 
   # 1. Network plot
   output$mynetworkid <- visNetwork::renderVisNetwork( {
-    NetworkPlot(AllData()$Nodes, AllData()$Edges)
+    Layout <- tolower(ifelse(input$layout == "Layout Reingold Tilford",
+                             stringr::str_replace_all(input$layout, " ","."),
+                             stringr::str_replace_all(input$layout, " ","_")))
+    NetworkPlot(AllData()$Nodes, AllData()$Edges, layout = Layout, physics = ifelse(input$physics == "Yes", T, F))
   })
 
   # 2. Legend
@@ -406,18 +409,6 @@ server <- function(input, output, session) { # Assemble inputs into outputs
       visNetwork::visPhysics(solver = GraphParams()$solver)
   })
 
-  # C) Physics (Y/N)
-  observeEvent(input$physics, {
-    visNetwork::visNetworkProxy("mynetworkid") %>%
-      visNetwork::visSetOptions(options = list(igraphlayout = list(physics = GraphParams()$physics)))
-  })
-
-  # D) Layout
-  observeEvent(input$layout, {
-    visNetwork::visNetworkProxy("mynetworkid") %>%
-      visNetwork::visSetOptions(options = list(igraphlayout = list(layout = GraphParams()$layout)))
-  })
-
   # 1) theta
   observeEvent(input$theta, {
     Options = list(physics = NULL)
@@ -502,21 +493,8 @@ server <- function(input, output, session) { # Assemble inputs into outputs
 
   # Saving parameters as defaults
   shiny::observeEvent(input$defaults, {
-    Defaults <- list(physics = input$physics,
-                     layout = input$layout,
-                     solver = input$solver,
-                     theta = input$theta,
-                     gravitationalConstant = input$gravitationalConstant,
-                     nodeDistance = input$nodeDistance,
-                     centralGravity = input$centralGravity,
-                     springLength = input$springLength,
-                     springConstant = input$springConstant,
-                     damping = input$damping,
-                     avoidOverlap = input$avoidOverlap,
-                     timestep = input$timestep,
-                     windX = input$windX,
-                     windY = input$windY)
-    saveRDS(Defaults, "www/Defaults.rds")
+    LibPath <- .libPaths()[1] # There may be more than one
+    saveRDS(GraphParams(), paste0(LibPath,"/CTUNetwork/shinyApp/www/Defaults.rds"))
 
     # Shiny alert to confirm defaults are saved
     shinyalert::shinyalert(
@@ -540,6 +518,112 @@ server <- function(input, output, session) { # Assemble inputs into outputs
   # Datatable box title
   output$TableTitle <- shiny::renderText({
     paste("Data table:",ifelse(is.null(input$node_id),"All",input$node_id))
+  })
+
+  ## RENDER UI elements
+
+  # 1) theta
+  output$theta.ui <- shiny::renderUI({
+    if (input$solver == "barnesHut" | input$solver == "forceAtlas2Based") {
+      shinyBS::tipify(
+        shinyWidgets::sliderTextInput(
+        inputId = "theta",
+        label = "theta",
+        choices = SolverRanges[[input$solver]]$theta,
+        selected = Defaults[[input$solver]]$theta),
+      title = "This parameter determines the boundary between consolidated long range forces and individual short range forces. To oversimplify higher values are faster but generate more errors, lower values are slower but with less errors.",
+      placement = "left")
+    }
+  })
+
+  # 2) gravitationalConstant
+  output$gravitationalConstant.ui <- shiny::renderUI({
+    if (input$solver == "barnesHut" | input$solver == "forceAtlas2Based") {
+      shinyBS::tipify(
+      shinyWidgets::sliderTextInput(
+        inputId = "gravitationalConstant",
+        label = "gravitationalConstant",
+        choices = SolverRanges[[input$solver]]$gravitationalConstant,
+        selected = Defaults[[input$solver]]$gravitationalConstant),
+      title = "Gravity attracts. We like repulsion. So the value is negative. If you want the repulsion to be stronger, decrease the value.",
+      placement = "left")
+    }
+  })
+
+  # 3) nodeDistance
+  output$nodeDistance.ui <- shiny::renderUI({
+    if (input$solver == "repulsion" | input$solver == "hierarchicalRepulsion") {
+      shinyBS::tipify(
+      shinyWidgets::sliderTextInput(
+        inputId = "nodeDistance",
+        label = "nodeDistance",
+        choices = SolverRanges[[input$solver]]$nodeDistance,
+        selected = Defaults[[input$solver]]$nodeDistance),
+      title = "This is the range of influence for the repulsion.",
+      placement = "left")
+    }
+  })
+
+  # 4) centralGravity
+  output$centralGravity.ui <- shiny::renderUI({
+    shinyBS::tipify(
+    shinyWidgets::sliderTextInput(
+      inputId = "centralGravity",
+      label = "centralGravity",
+      choices = SolverRanges[[input$solver]]$centralGravity,
+      selected = Defaults[[input$solver]]$centralGravity),
+    title = "There is a central gravity attractor to pull the entire network back to the center.",
+    placement = "left")
+  })
+
+  # 5) springLength
+  output$springLength.ui <- shiny::renderUI({
+    shinyBS::tipify(
+    shinyWidgets::sliderTextInput(
+      inputId = "springLength",
+      label = "springLength",
+      choices = SolverRanges[[input$solver]]$springLength,
+      selected = Defaults[[input$solver]]$springLength),
+    title = "The edges are modelled as springs. This springLength here is the the rest length of the spring.",
+    placement = "left")
+  })
+
+  # 6) springConstant
+  output$springConstant.ui <- shiny::renderUI({
+    shinyBS::tipify(
+    shinyWidgets::sliderTextInput(
+      inputId = "springConstant",
+      label = "springConstant",
+      choices = SolverRanges[[input$solver]]$springConstant,
+      selected = Defaults[[input$solver]]$springConstant),
+    title = "This is how sturdy the springs are. Higher values mean stronger springs.",
+    placement = "left")
+  })
+
+  # 7) damping
+  output$damping.ui <- shiny::renderUI({
+    shinyBS::tipify(
+    shinyWidgets::sliderTextInput(
+      inputId = "damping",
+      label = "damping",
+      choices = SolverRanges[[input$solver]]$damping,
+      selected = Defaults[[input$solver]]$damping),
+    title = "The damping factor is how much of the velocity from the previous physics simulation iteration carries over to the next iteration.",
+    placement = "left")
+  })
+
+  # 8) avoidOverlap
+  output$avoidOverlap.ui <- shiny::renderUI({
+    if (input$solver != "repulsion") {
+      shinyBS::tipify(
+      shinyWidgets::sliderTextInput(
+        inputId = "avoidOverlap",
+        label = "avoidOverlap",
+        choices = SolverRanges[[input$solver]]$avoidOverlap,
+        selected = Defaults[[input$solver]]$avoidOverlap),
+      title = "When larger than 0, the size of the node is taken into account. The distance will be calculated from the radius of the encompassing circle of the node for both the gravity model. Value 1 is maximum overlap avoidance.",
+      placement = "left")
+    }
   })
 
   # End session when App is stopped
