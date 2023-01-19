@@ -20,6 +20,10 @@ if (grepl("windows", Sys.info()[1], ignore.case = TRUE)){
     # All_Tabs$worker <- pf::decodeCustomFields(All_Tabs$worker, All_Tabs$customfields)
   # })
 
+  # USING RmariaDB (TESTS CURRENTLY)
+  # RmariaDB::dbConnect(RMariaDB::MariaDB(),
+  #                     catalog_name = "projectfacts")
+
   # If ODBC connection fails, then loads from local R: drive
   # if (grepl("try-error", class(Tryclass), ignore.case = T)) {
     All_Tabs <- pf::getPFData()
