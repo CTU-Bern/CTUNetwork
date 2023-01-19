@@ -51,7 +51,7 @@ COPY ./inst/shinyApp ./app
 COPY ./ ./CTUNetwork
 
 # Making the backend data file accessible
-COPY /home/wichtc91/Documents/pf_tabs.rds /app/
+COPY ./pf_tabs.rds /app/
 
 # Install deps
 RUN Rscript -e 'install.packages(c("remotes", "igraph"))'
