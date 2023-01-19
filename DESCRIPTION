@@ -29,6 +29,7 @@ Imports:
     shinyjs,
     shinyWidgets,
     shinyBS,
+    shinyalert,
     stringr,
     tidyr,
     visNetwork,

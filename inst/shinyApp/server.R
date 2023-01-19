@@ -7,12 +7,12 @@
 #' @importFrom gridExtra grid.arrange
 #' @importFrom shinyWidgets updateSliderTextInput
 #' @importFrom shinyBS tipify
+#' @importFrom shinyalert shinyalert
 #' @import visNetwork
 #' @import dplyr
 #' @import grid
 #' @import ggplot2
 #' @import shiny
-#' @import shinyalert
 #' @export
 
 require(CTUNetwork)
