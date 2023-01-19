@@ -1,6 +1,8 @@
 # CTU Network Shiny global variables
 #' @importFrom remotes install_local
 #' @importFrom pf getPFData
+#' @importFrom DBI dbConnect
+#' @importFrom RMariaDB MariaDB
 #' @export
 
 # Load the package functions
@@ -11,18 +13,21 @@ library("CTUNetwork")
 if (grepl("windows", Sys.info()[1], ignore.case = TRUE)){
 
   # Projectfacts data loaded through ODBC connection (if available)
-  # Tryclass <- try({
-    # All_Tabs <- pf::getPFData(NULL)
-    # add custom fields
-    # All_Tabs$customer <- pf::decodeCustomFields(All_Tabs$customer, All_Tabs$customfields)
-    # All_Tabs$project <- pf::decodeCustomFields(All_Tabs$project, All_Tabs$customfields)
-    # All_Tabs$ticket <- pf::decodeCustomFields(All_Tabs$ticket, All_Tabs$customfields)
-    # All_Tabs$worker <- pf::decodeCustomFields(All_Tabs$worker, All_Tabs$customfields)
-  # })
+  Tryclass <- try({
+    # Using the RmariaDB package
+    # This will only work is DSN is configured
+    creds <- readLines("ODBC_Credentials.txt") # Retrieve file containing password (not under version control!)
+    con <- DBI::dbConnect(RMariaDB::MariaDB(),
+                          catalog_name = "projectfacts",
+                          user = "pf-report",
+                          password = creds[1],
+                          host = "projectfacts.ctu.unibe.ch",
+                          port = 0)
+    All_Tabs <- getPFData(file = NULL, con = con)
 
-  # USING RmariaDB (TESTS CURRENTLY)
-  # source("R/GetODBC.R")
-  # All_Tabs <- GetODBC()
+    # add custom fields
+    All_Tabs$ticket <- pf::decodeCustomFields(All_Tabs$ticket, All_Tabs$customfields)
+  })
 
   # If ODBC connection fails, then loads from local R: drive
   # if (grepl("try-error", class(Tryclass), ignore.case = T)) {
