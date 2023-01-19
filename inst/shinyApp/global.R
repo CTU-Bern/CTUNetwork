@@ -21,8 +21,8 @@ if (grepl("windows", Sys.info()[1], ignore.case = TRUE)){
   # })
 
   # USING RmariaDB (TESTS CURRENTLY)
-  # RmariaDB::dbConnect(RMariaDB::MariaDB(),
-  #                     catalog_name = "projectfacts")
+  # source("R/GetODBC.R")
+  # All_Tabs <- GetODBC()
 
   # If ODBC connection fails, then loads from local R: drive
   # if (grepl("try-error", class(Tryclass), ignore.case = T)) {
