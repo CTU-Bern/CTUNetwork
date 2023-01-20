@@ -5,7 +5,9 @@
 #'
 #' @param nodes dataframe containing nodes data, see visNetwork()
 #' @param edges dataframe containing edges data, see visNetwork()
-#' @param params list of parameters to control graph physics behaviour, see visIgraphLayout() and visPhysics()
+#' @param layout igraph layouts to compute coordinates, see visIgraphLayout()
+#' @param physics activate/deactivate physics properties, see visIgraphLayout()
+#' @param params optional parameters to manipulate physics properties, see visPhysics()
 #'
 #' @import visNetwork
 #' @export
@@ -15,9 +17,7 @@
 
 NetworkPlot <- function(nodes, edges, layout = "layout_on_sphere", physics = T){
 
-  # params = list(layout = "layout_on_sphere",
-  #               physics = T,
-  #               solver = "hierarchicalRepulsion",
+  # params = list(solver = "hierarchicalRepulsion",
   #               timestep = 0.5,
   #               windX = 0,
   #               windY = 0,
@@ -26,7 +26,7 @@ NetworkPlot <- function(nodes, edges, layout = "layout_on_sphere", physics = T){
   #                                            springLength = 850,
   #                                            springConstant = 0.01,
   #                                            damping = 0.09,
-  #                                            avoidOverlap = 0)
+  #                                            avoidOverlap = 0))
 
   # Create the initial plot
   Plot <- visNetwork::visNetwork(nodes, edges,
@@ -44,8 +44,7 @@ NetworkPlot <- function(nodes, edges, layout = "layout_on_sphere", physics = T){
   # # Add the options
   # if (params$solver == "barnesHut" | params$solver == "forceAtlas2Based"){
   #   Plot <- Plot %>%
-  #   visNetwork::visPhysics(enabled = params$physics,
-  #                          solver = params$solver,
+  #   visNetwork::visPhysics(solver = params$solver,
   #                          timestep = params$timestep,
   #                          wind = list(X = params$windX, Y = params$windY),
   #                          stabilization = "onlyDynamicEdges",
@@ -59,8 +58,7 @@ NetworkPlot <- function(nodes, edges, layout = "layout_on_sphere", physics = T){
   #
   # } else if (params$solver == "repulsion") {
   #   Plot <- Plot %>%
-  #     visNetwork::visPhysics(enabled = params$physics,
-  #                            solver = "repulsion",
+  #     visNetwork::visPhysics(solver = "repulsion",
   #                            timestep = params$timestep,
   #                            wind = list(X = params$windX, Y = params$windY),
   #                            stabilization = "onlyDynamicEdges",
@@ -72,8 +70,7 @@ NetworkPlot <- function(nodes, edges, layout = "layout_on_sphere", physics = T){
 #
 #   } else if (params$solver == "hierarchicalRepulsion") {
 #     Plot <- Plot %>%
-#       visNetwork::visPhysics(enabled = params$physics,
-#                              solver = "hierarchicalRepulsion",
+#       visNetwork::visPhysics(solver = "hierarchicalRepulsion",
 #                              timestep = params$timestep,
 #                              wind = list(X = params$windX, Y = params$windY),
 #                              stabilization = "onlyDynamicEdges",
