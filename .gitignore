@@ -6,3 +6,4 @@ docker/docker-compose.yml
 TEMP/pf_tabs.rds
 ODBC_Credentials.txt
 *.bak
+UbuntuCMDs.txt
