@@ -4,27 +4,12 @@
 \alias{filterData}
 \title{Filter ProjectFacts data from the getPFData function}
 \usage{
-filterData(
-  Data,
-  All_Tabs,
-  DLF = F,
-  Divisions = NA,
-  DateFrom = NA,
-  ServiceType = NA
-)
+filterData(Data, All_Tabs)
 }
 \arguments{
 \item{Data}{result from e.g. extractData}
 
 \item{All_Tabs}{result from e.g. getPFData}
-
-\item{DLF}{Optional: flag to filter project with "TRUE" or without "FALSE" DLF support}
-
-\item{Divisions}{Optional: filter data for specific division, e.g. "Data Management", "Statistics", ...}
-
-\item{DateFrom}{Optional: filter data from a specified date formatted as dd-mm-yyyy up until now.}
-
-\item{ServiceType}{Optional: filter according to service types, e.g. "Light", "Full", ...}
 }
 \value{
 dataframe
@@ -35,5 +20,5 @@ Filter ProjectFacts data from the getPFData function
 \examples{
 All_Tabs <- getPFData()
 Data <- extractData(All_Tabs)
-Data <- extractData(DLF = T, Divisions = "Data Managemement")
+Data <- filterData(Data, All_Tabs)
 }

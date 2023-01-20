@@ -2,10 +2,6 @@
 #'
 #' @param Data result from e.g. extractData
 #' @param All_Tabs result from e.g. getPFData
-#' @param DLF Optional: flag to filter project with "TRUE" or without "FALSE" DLF support
-#' @param Divisions Optional: filter data for specific division, e.g. "Data Management", "Statistics", ...
-#' @param DateFrom Optional: filter data from a specified date formatted as dd-mm-yyyy up until now.
-#' @param ServiceType Optional: filter according to service types, e.g. "Light", "Full", ...
 #'
 #' @return dataframe
 #' @importFrom reshape2 melt
@@ -15,9 +11,9 @@
 #' @examples
 #' All_Tabs <- getPFData()
 #' Data <- extractData(All_Tabs)
-#' Data <- extractData(DLF = T, Divisions = "Data Managemement")
+#' Data <- filterData(Data, All_Tabs)
 
-filterData <- function(Data, All_Tabs, DLF = F, Divisions = NA, DateFrom = NA, ServiceType = NA){
+filterData <- function(Data, All_Tabs){
 
   # Disable dplyr warning message
   options(dplyr.summarise.inform = FALSE)
@@ -25,38 +21,7 @@ filterData <- function(Data, All_Tabs, DLF = F, Divisions = NA, DateFrom = NA, S
   # Extracting useful data from All_Tabs and storing them into data-frames
   TimeBooking.df <- All_Tabs$activitydata[,c("FK_PROJECT","FK_WORKER","Timespent_billable","BookedDate", "INCOMEFROMINVOICE_BILLABLE")]
 
-  # 1) FILTER INPUT DATASET BASED ON OPTIONAL ARGUMENTS ####
-  # -------------------------------------------------------------------------- #
-  # 1.1) Divisions
-  if (!is.na(Divisions)) {
-    FiltIdx <- mapply(grepl,Divisions, Data$ProjectName, ignore.case=T)
-    FiltIdx <- Data$PackageLvl %in% Data$UniqueCode[FiltIdx] |
-      Data$UniqueCode %in% Data$ProjectLvl[FiltIdx]
-    Data <- Data[FiltIdx,]
-  }
-
-  # 1.2) DLF funding
-  if (DLF == T){
-    FiltIdx <- Data$DLFSupport==T # | is.na(Data$DLFSupport)
-    FiltIdx <- Data$ProjectLvl %in% Data$ProjectLvl[which(FiltIdx)]
-    Data <- Data[FiltIdx,]
-  }
-
-  # 1.3) Time bookings
-  if (!is.na(DateFrom)) {
-    DateFrom <- as.Date(as.Date(DateFrom, format="%d-%m-%Y"), format="%Y-%m-%d")
-    IdxDateFrom <- which(ifelse(TimeBooking.df$BookedDate-DateFrom>0,T,F)==T)
-    TimeBooking.df <- TimeBooking.df[IdxDateFrom,]
-  }
-
-  # 1.4) Service Type
-  if (!is.na(ServiceType)) {
-    FiltIdx <- Data$ServiceType==ServiceType
-    FiltIdx <- Data$ProjectLvl %in% Data$ProjectLvl[which(FiltIdx)]
-    Data <- Data[FiltIdx,]
-  }
-
-  # 2) AGGREGATING INPUT DATASET WITH All_Tabs ####
+  # AGGREGATING INPUT DATASET WITH All_Tabs ####
   # -------------------------------------------------------------------------- #
 
   # aggregating the project dataframe with corresponding timebookings
@@ -64,7 +29,7 @@ filterData <- function(Data, All_Tabs, DLF = F, Divisions = NA, DateFrom = NA, S
     dplyr::rename(Workers = "FK_WORKER", TimeSpent = "Timespent_billable") %>%  # renaming new columns
     dplyr::mutate(HourlyCosts = INCOMEFROMINVOICE_BILLABLE) %>%
     dplyr::select(-INCOMEFROMINVOICE_BILLABLE)
-  Data <- Data[,c(1:19,28,20,21,29,27,22:26)]# Reordering columns
+  Data <- Data[,c(1:19,29,20,21,30,28,22:26,27)]# Reordering columns
 
   # Replacing the Workers code by names
   Data <- dplyr::left_join(Data, All_Tabs$worker[,c("PK_Worker","ShowName")], by = c("Workers" = "PK_Worker"))
@@ -105,6 +70,22 @@ filterData <- function(Data, All_Tabs, DLF = F, Divisions = NA, DateFrom = NA, S
     dplyr::select(-SUMBRUTTO)
   Data$FixedCosts <- replace(Data$FixedCosts, duplicated(Data$UniqueCode), NA)
   Data$MoneyBudget <- replace(Data$MoneyBudget, duplicated(Data$UniqueCode), NA)
+
+  # Determining the date DLF > 3000CHF was reached
+  # THIS IS TOO SLOW....
+  # UniqueProj <- unique(Data$ProjectIDs)
+  # UniqueProj <- UniqueProj[grepl("P-",UniqueProj)]
+  # for (k in 1:length(UniqueProj)) {
+  #   DF <- Data[Data$ProjectIDs==UniqueProj[k] & grepl("001",Data$ProjectID),] # package names starting by 001 are DM-related
+  #   MoneyDF <- data.frame(ID = c(rownames(DF[!is.na(DF$FixedCosts),]),rownames(DF)),
+  #                         Sum = c(DF$FixedCosts[!is.na(DF$FixedCosts)], tidyr::replace_na(DF$HourlyCosts,0)))
+  #   DLFReachedIdx <- MoneyDF$ID[match(1, cumsum(MoneyDF$Sum > 3000))]
+  #   DLFReachedDT <- DF$BookedDate[which(rownames(DF)==DLFReachedIdx)]
+  #
+  #   # Store date when DLF was reached in main dataset
+  #   Data$DLFReached[!Data$Filt & Data$ProjectIDs==UniqueProj[k]] <-
+  #     as.Date(ifelse(length(DLFReachedDT)<1,NA,DLFReachedDT), origin = .Date(0))
+  # }
 
   # Changing data format
   Cols <- c("ProjectID","Service","CDMS","State","DLFReached","CustomerID","Manager")

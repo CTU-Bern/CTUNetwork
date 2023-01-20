@@ -47,7 +47,7 @@ extractData <- function(All_Tabs){
                          Sponsor = Projects.df$cf_sponsor, # Sponsor notes
                          DMNotes = Projects.df$CUSTOMFIELDVALUES, # Data Management notes
                          DLFSupport = Projects.df$cf_dlf_data_management_support,
-                         DLFReached = rep(NA,dim(Projects.df)[1]),
+                         DLFReached = rep(as.Date(NA),dim(Projects.df)[1]),
                          ProdDate = Projects.df$STATECOMMENT,
                          Manager = Projects.df$FK_PERSONINCHARGE, # THIS DOES NOT CORRESPOND TO THE RESPONSIBLE/SUBSTITUTE COLUMNS !
                          TimeBudget = dplyr::coalesce(Projects.df$BillableTimeBudget,Projects.df$BillableTimeBudgetCumulated), # merge two columns

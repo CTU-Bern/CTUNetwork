@@ -9,6 +9,8 @@
 #' @importFrom shinyBS tipify
 #' @importFrom shinyalert shinyalert
 #' @importFrom ipify get_ip
+#' @importFrom foreach foreach
+#' @importFrom foreach "%do%"
 #' @import visNetwork
 #' @import dplyr
 #' @import grid
@@ -88,6 +90,18 @@ server <- function(input, output, session) { # Assemble inputs into outputs
         FiltIdx <- FiltIdx & grepl(ifelse(input$dlfsupport=="Yes", T, F),DataUp$DLFSupport)
       }
 
+      # Filter for DLF support reached (at within specific date range, if specified by time bookings)
+      if (input$dlfreached!="\a") {
+        # DataUp$DLFReached <- as.Date(DataUp$DLFReached)
+        # DLFReachedDF <- data.frame(Projects = unique(DataUp$ProjectLvl), DLFReachedYN = NA)
+        # DLFReachedDF$DLFReachedYN <- foreach::foreach(k=1:length(DLFReachedDF$Projects), .combine = 'c') %do%
+        #   (DataUp$DLFReached[which(DataUp$UniqueCode == DLFReachedDF$Projects[k])[1]] %in% input$timebookfilter[1]:input$timebookfilter[2])
+        #
+        # # Save to filtering index
+        # FiltIdx <- FiltIdx &
+        #   DataUp$ProjectLvl %in% DLFReachedDF$Projects[DLFReachedDF$DLFReachedYN==ifelse(input$dlfreached=="Yes",T,F)]
+      }
+
       # Apply filtering
       DataUp <- DataUp[FiltIdx,]
       DataUp <- droplevels(DataUp) # remove unused factor levels
@@ -107,13 +121,6 @@ server <- function(input, output, session) { # Assemble inputs into outputs
 
     # Computing different calculations based on filtering parameters
     DataUp <- Calculations(DataUp)
-
-    # Filter for DLF support reached
-    # This needs to be placed after the time bookings filtering and re-caculation of $DLFReached (in Calculations())
-    if (input$dlfreached!="\a") {
-      Idx <- DataUp$ProjectIDs[which(grepl(ifelse(input$dlfreached=="Yes", T, F),DataUp$DLFReached))]
-      TEMP <- DataUp[which(DataUp$ProjectIDs %in% Idx),]
-    }
 
     ## Preparing data for network
     # Removing the lines corresponding to the project level (the aim is to separate for each division)

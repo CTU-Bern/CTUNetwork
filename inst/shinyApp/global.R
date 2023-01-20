@@ -27,7 +27,7 @@ if (grepl("windows", Sys.info()[1], ignore.case = TRUE)){
 
     # add custom fields
     All_Tabs$ticket <- pf::decodeCustomFields(All_Tabs$ticket, All_Tabs$customfields)
-  })
+  }, silent = TRUE)
 
   # If ODBC connection fails, then loads from local R: drive
   # if (grepl("try-error", class(Tryclass), ignore.case = T)) {
@@ -50,11 +50,11 @@ All_Tabs = All_Tabs[c("activitydata","customer","crmkontakt","financeposition",
 # Retrieve data
 Data <- extractData(All_Tabs)
 
-# Filter data
-Data <- filterData(Data, All_Tabs)
-
 # Filtering the lines corresponding to the project level (the aim is to separate for each division)
 Data$Filt <- grepl("\\.|C-", Data$ProjectID)
+
+# Filter data
+Data <- filterData(Data, All_Tabs)
 
 # Free-up memory space
 remove(All_Tabs)
@@ -78,7 +78,8 @@ SelectRows <- AllRows[c(1,3,4,8,18,20,21,22,23,24)]
 FileName <- paste0("Defaults_",Sys.getenv("USERNAME"),".rds")
 FilePath <- paste0("/CTUNetwork/shinyApp/parameters/", FileName)
 SettingsPath <- ifelse(grepl("windows", Sys.info()[1], ignore.case = TRUE),
-                       paste0(.libPaths()[1],FilePath), FilePath)
+                       paste0(.libPaths()[1],"/CTUNetwork/shinyApp/www/", FileName),
+                       paste0("/CTUNetwork/shinyApp/parameters/", FileName))
 if (file.exists(SettingsPath)) {
   Defaults <- readRDS(SettingsPath)
 } else {

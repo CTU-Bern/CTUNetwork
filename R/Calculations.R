@@ -34,11 +34,6 @@ Calculations <- function(Data){
   # Reordering the database according to natural order
   Data <- Data[stringr::str_order(Data$ProjectIDs),]
 
-  # Determine if DLF is reached (MoneySpent > 3000CHF)
-  Idx = which(grepl("P-", Data$ProjectID))
-  Data$DLFReached <- as.logical(Data$DLFReached)
-  Data$DLFReached[Idx] <- ifelse(Data$MoneySpent[Idx] > 3000, TRUE, FALSE)
-
   # OUTPUT
   return(Data)
 }
