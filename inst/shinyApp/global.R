@@ -34,7 +34,25 @@ if (grepl("windows", Sys.info()[1], ignore.case = TRUE)){
     All_Tabs <- pf::getPFData()
   # }
 } else {
-  # print(paste0("the current directory is: ",getwd()))
+
+  # Projectfacts data loaded through ODBC connection (if available)
+  Tryclass <- try({
+    # Using the RmariaDB package
+    # This will only work is DSN is configured
+    creds <- readLines("ODBC_Credentials.txt") # Retrieve file containing password (not under version control!)
+    con <- DBI::dbConnect(RMariaDB::MariaDB(),
+                          catalog_name = "projectfacts",
+                          user = "pf-report",
+                          password = creds[1],
+                          host = "projectfacts.ctu.unibe.ch",
+                          port = 0)
+    All_Tabs <- getPFData(file = NULL, con = con)
+
+    # add custom fields
+    All_Tabs$ticket <- pf::decodeCustomFields(All_Tabs$ticket, All_Tabs$customfields)
+  }, silent = FALSE)
+
+  # Else use a local copy (TEMPORARY)
   All_Tabs <- pf::getPFData(file = "pf_tabs.rds")
 }
 # Only keeping useful information from All_Tabs
