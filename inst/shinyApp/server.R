@@ -494,12 +494,6 @@ server <- function(input, output, session) { # Assemble inputs into outputs
 
   # Saving parameters as defaults
   shiny::observeEvent(input$defaults, {
-
-    # Retrieve IP address of user's computer so that defaults are user-specific
-    # FileName <- paste0("Defaults",ipify::get_ip(),".rds")
-    # SettingsPath <- ifelse(grepl("windows", Sys.info()[1], ignore.case = TRUE),
-    #                        paste0(.libPaths()[1],"/CTUNetwork/shinyApp/www/", FileName), # There may be more than one
-    #                        paste0("shinyApp/www/", FileName))
     saveRDS(GraphParams(), SettingsPath)
 
     # Shiny alert to confirm defaults are saved
@@ -633,5 +627,5 @@ server <- function(input, output, session) { # Assemble inputs into outputs
   })
 
   # End session when App is stopped
-  # session$onSessionEnded(stopApp)
+  session$onSessionEnded(stopApp)
 }
