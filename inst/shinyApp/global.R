@@ -3,6 +3,7 @@
 #' @importFrom pf getPFData
 #' @importFrom DBI dbConnect
 #' @importFrom RMariaDB MariaDB
+#' @importFrom ipify get_ip
 #' @export
 
 # Load the package functions
@@ -74,9 +75,11 @@ names(AllRows) <- colnames(Data)[-dim(Data)[2]]
 SelectRows <- AllRows[c(1,3,4,8,18,20,21,22,23,24)]
 
 # Load default parameters
+# Retrieve IP address of user's computer so that defaults are user-specific
+FileName <- paste0("Defaults",ipify::get_ip(),".rds")
 SettingsPath <- ifelse(grepl("windows", Sys.info()[1], ignore.case = TRUE),
-                       paste0(.libPaths()[1],"/CTUNetwork/shinyApp/www/Defaults.rds"), # There may be more than one
-                       "shinyApp/www/Defaults.rds")
+                       paste0(.libPaths()[1],"/CTUNetwork/shinyApp/www/", SettingsPath),
+                       paste0("shinyApp/www/", SettingsPath))
 if (file.exists(SettingsPath)) {
   Defaults <- readRDS(SettingsPath)
 } else {

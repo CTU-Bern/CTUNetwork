@@ -33,9 +33,12 @@ Imports:
     stringr,
     tidyr,
     visNetwork,
-    janitor
+    janitor,
+    ipify
 Depends:
     foreach,
     magrittr,
     igraph
-Remotes: CTU-Bern/pf
+Remotes: 
+    CTU-Bern/pf
+    gregce/ipify

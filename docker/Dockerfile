@@ -53,9 +53,6 @@ COPY ./ ./CTUNetwork
 # Making the backend data file accessible
 COPY ./pf_tabs.rds /app/
 
-# Creating a volume to store the settings (persistent across container lifetime)
-RUN sudo docker volume create ctunetworksettings
-
 # Install deps
 RUN Rscript -e 'install.packages(c("remotes", "igraph"))'
 RUN Rscript -e 'remotes::install_deps("CTUNetwork", dependencies = TRUE)'
