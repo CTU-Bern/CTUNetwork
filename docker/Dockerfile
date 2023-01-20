@@ -8,7 +8,7 @@ RUN apt-get update -qq && apt-get -y --no-install-recommends install \
     libcairo2-dev \
     libsqlite3-dev \
     libmariadbd-dev \
-    libmysqlclient-dev \
+    libmysqlclient21 \
     libpq-dev \
     libssh2-1-dev \
     unixodbc-dev \
