@@ -74,9 +74,8 @@ names(AllRows) <- colnames(Data)[-dim(Data)[2]]
 SelectRows <- AllRows[c(1,3,4,8,18,20,21,22,23,24)]
 
 # Load default parameters
-# Retrieve IP address of user's computer so that defaults are user-specific
-IP <- gsub(".*? ([[:digit:]])", "\\1", system("ipconfig", intern=T)[grep("IPv4", system("ipconfig", intern = T))])
-FileName <- paste0("Defaults_",IP[1],".rds")
+# Retrieve computer's user name to save settings individually
+FileName <- paste0("Defaults_",Sys.getenv("USERNAME"),".rds")
 SettingsPath <- ifelse(grepl("windows", Sys.info()[1], ignore.case = TRUE),
                        paste0(.libPaths()[1],"/CTUNetwork/shinyApp/www/", FileName),
                        paste0("shinyApp/www/", FileName))
