@@ -39,6 +39,4 @@ Depends:
     foreach,
     magrittr,
     igraph
-Remotes: 
-    CTU-Bern/pf
-    gregce/ipify
+Remotes: CTU-Bern/pf,gregce/ipify

@@ -76,7 +76,7 @@ SelectRows <- AllRows[c(1,3,4,8,18,20,21,22,23,24)]
 
 # Load default parameters
 # Retrieve IP address of user's computer so that defaults are user-specific
-FileName <- paste0("Defaults",ipify::get_ip(),".rds")
+FileName <- paste0("Defaults_",ipify::get_ip(),".rds")
 SettingsPath <- ifelse(grepl("windows", Sys.info()[1], ignore.case = TRUE),
                        paste0(.libPaths()[1],"/CTUNetwork/shinyApp/www/", SettingsPath),
                        paste0("shinyApp/www/", SettingsPath))
