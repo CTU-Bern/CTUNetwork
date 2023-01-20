@@ -76,9 +76,9 @@ SelectRows <- AllRows[c(1,3,4,8,18,20,21,22,23,24)]
 # Load default parameters
 # Retrieve computer's user name to save settings individually
 FileName <- paste0("Defaults_",Sys.getenv("USERNAME"),".rds")
+FilePath <- paste0("/CTUNetwork/shinyApp/parameters/", FileName)
 SettingsPath <- ifelse(grepl("windows", Sys.info()[1], ignore.case = TRUE),
-                       paste0(.libPaths()[1],"/CTUNetwork/shinyApp/www/", FileName),
-                       paste0("shinyApp/www/", FileName))
+                       paste0(.libPaths()[1],FilePath), FilePath)
 if (file.exists(SettingsPath)) {
   Defaults <- readRDS(SettingsPath)
 } else {
