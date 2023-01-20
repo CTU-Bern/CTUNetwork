@@ -33,7 +33,9 @@ Imports:
     stringr,
     tidyr,
     visNetwork,
-    janitor
+    janitor,
+    RMariaDB,
+    DBI
 Depends:
     foreach,
     magrittr,
