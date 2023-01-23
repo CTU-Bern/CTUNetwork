@@ -8,6 +8,7 @@
 #' @importFrom shinyWidgets updateSliderTextInput
 #' @importFrom shinyBS tipify
 #' @importFrom shinyalert shinyalert
+#' @importFrom shinyjs disable
 #' @importFrom ipify get_ip
 #' @importFrom foreach foreach
 #' @importFrom foreach "%do%"
@@ -101,6 +102,11 @@ server <- function(input, output, session) { # Assemble inputs into outputs
         # FiltIdx <- FiltIdx &
         #   DataUp$ProjectLvl %in% DLFReachedDF$Projects[DLFReachedDF$DLFReachedYN==ifelse(input$dlfreached=="Yes",T,F)]
       }
+
+      # Temporarily disable the "DLF reached" selectinput component
+      # See: https://stackoverflow.com/questions/60975324/shiny-disable-selectinput-but-the-users-can-see-the-available-options-but-i-can
+      shinyjs::disable("dlfreached")
+
 
       # Apply filtering
       DataUp <- DataUp[FiltIdx,]

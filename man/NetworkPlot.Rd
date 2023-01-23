@@ -14,7 +14,11 @@ NetworkPlot(nodes, edges, layout = "layout_on_sphere", physics = T)
 
 \item{edges}{dataframe containing edges data, see visNetwork()}
 
-\item{params}{list of parameters to control graph physics behaviour, see visIgraphLayout() and visPhysics()}
+\item{layout}{igraph layouts to compute coordinates, see visIgraphLayout()}
+
+\item{physics}{activate/deactivate physics properties, see visIgraphLayout()}
+
+\item{params}{optional parameters to manipulate physics properties, see visPhysics()}
 }
 \description{
 Network plot function - Build the network
