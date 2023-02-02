@@ -18,12 +18,12 @@ if (grepl("windows", Sys.info()[1], ignore.case = TRUE)){
     # This will only work is DSN is configured
     creds <- readLines("ODBC_Credentials.txt") # Retrieve file containing password (not under version control!)
     con <- DBI::dbConnect(RMariaDB::MariaDB(),
-                          catalog_name = "projectfacts",
+                          dbname = "projectfacts",
                           user = "pf-report",
                           password = creds[1],
-                          host = "projectfacts.ctu.unibe.ch",
+                          host = "profacts.ctu.unibe.ch",
                           port = 0)
-    All_Tabs <- getPFData(file = NULL, con = con)
+    All_Tabs <- pf::getPFData(file = NULL, con = con)
 
     # add custom fields
     All_Tabs$ticket <- pf::decodeCustomFields(All_Tabs$ticket, All_Tabs$customfields)
@@ -41,12 +41,12 @@ if (grepl("windows", Sys.info()[1], ignore.case = TRUE)){
     # This will only work is DSN is configured
     creds <- readLines("ODBC_Credentials.txt") # Retrieve file containing password (not under version control!)
     con <- DBI::dbConnect(RMariaDB::MariaDB(),
-                          catalog_name = "projectfacts",
+                          dbname = "projectfacts",
                           user = "pf-report",
                           password = creds[1],
-                          host = "projectfacts.ctu.unibe.ch",
+                          host = "profacts.ctu.unibe.ch",
                           port = 0)
-    All_Tabs <- getPFData(file = NULL, con = con)
+    All_Tabs <- pf::getPFData(file = NULL, con = con)
 
     # add custom fields
     All_Tabs$ticket <- pf::decodeCustomFields(All_Tabs$ticket, All_Tabs$customfields)
